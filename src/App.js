@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import './App.css';
-import UserList from './components/UserList';
+import "./App.css";
+import UserList from "./components/UserList";
 import { send_userLogin } from "./redux/actions";
-import LoginForm from './components/LoginForm';
-import { getCurrentUserUuid } from './util/user';
+import LoginForm from "./components/LoginForm";
+import { getCurrentUserUuid } from "./util/user";
 
 class App extends Component {
 	render() {

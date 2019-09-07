@@ -13,7 +13,7 @@ const UserList = ({ users }) => (
 );
 
 const mapStateToProps = state => ({
-		users: state.users
+	users: state.users
 });
 
 export default connect(
