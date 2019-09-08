@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { send_userLogin } from "../redux/actions";
 import generateUuid from "uuid/v1";
+import { sendUserLogin } from "../redux/actions";
 import {
   getCurrentUserName,
   getCurrentUserUuid,
@@ -23,17 +24,17 @@ class LoginForm extends Component {
 
   handleLogin = () => {
     const { username } = this.state;
+    const { sendUserLogin: sendLoginEventToServer } = this.props;
 
     if (username !== "") {
       if (!getCurrentUserUuid()) {
         setCurrentUserUuid(generateUuid());
       }
-
       if (!getCurrentUserName()) {
         setCurrentUserName(username);
       }
 
-      this.props.send_userLogin({ username });
+      sendLoginEventToServer({ username });
     }
 
     this.setState({ username: "" });
@@ -43,13 +44,19 @@ class LoginForm extends Component {
     return (
       <div>
         <input onChange={e => this.handleInputChange(e.target.value)} />
-        <button onClick={this.handleLogin}>Login</button>
+        <button type="button" onClick={this.handleLogin}>
+          Login
+        </button>
       </div>
     );
   }
 }
 
+LoginForm.propTypes = {
+  sendUserLogin: PropTypes.func.isRequired
+};
+
 export default connect(
   null,
-  { send_userLogin }
+  { sendUserLogin }
 )(LoginForm);
