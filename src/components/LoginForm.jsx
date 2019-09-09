@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { Redirect } from "react-router-dom";
 import generateUuid from "uuid/v1";
 import { sendUserLogin } from "../redux/actions";
 import {
-  getCurrentUserName,
-  getCurrentUserUuid,
   setCurrentUserName,
   setCurrentUserUuid
 } from "../util/user";
@@ -22,41 +21,48 @@ class LoginForm extends Component {
     this.setState({ username });
   };
 
-  handleLogin = () => {
+  handleSubmit = () => {
     const { username } = this.state;
-    const { sendUserLogin: sendLoginEventToServer } = this.props;
+    const { sendUserLogin } = this.props;
 
     if (username !== "") {
-      if (!getCurrentUserUuid()) {
-        setCurrentUserUuid(generateUuid());
-      }
-      if (!getCurrentUserName()) {
-        setCurrentUserName(username);
-      }
-
-      sendLoginEventToServer({ username });
+      setCurrentUserUuid(generateUuid());
+      setCurrentUserName(username);
+      sendUserLogin({ username });
     }
 
     this.setState({ username: "" });
   };
 
   render() {
-    return (
+    const { currentUser } = this.props;
+
+    return !currentUser.isLoggedIn ? (
       <div>
-        <input onChange={e => this.handleInputChange(e.target.value)} />
-        <button type="button" onClick={this.handleLogin}>
-          Login
-        </button>
+        <h1>Planning Poker</h1>
+        <form onSubmit={this.handleSubmit} action="/">
+          <input onChange={e => this.handleInputChange(e.target.value)} />
+          <input type="submit" value="Login" />
+        </form>
       </div>
+    ) : (
+      <Redirect to="/my-sessions">No</Redirect>
     );
   }
 }
 
+const mapStateToProps = state => ({
+  currentUser: state.currentUser
+});
+
 LoginForm.propTypes = {
-  sendUserLogin: PropTypes.func.isRequired
+  sendUserLogin: PropTypes.func.isRequired,
+  currentUser: PropTypes.shape({
+    isLoggedIn: PropTypes.bool.isRequired
+  }).isRequired
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   { sendUserLogin }
 )(LoginForm);

@@ -1,23 +1,22 @@
 import React from "react";
-import { connect } from "react-redux";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import UserList from "./components/UserList";
-import { sendUserLogin } from "./redux/actions";
 import LoginForm from "./components/LoginForm";
-import { getCurrentUserUuid } from "./util/user";
+import Header from "./components/Header";
+import JoinSessions from "./components/JoinSessions";
+import MySessions from "./components/MySessions";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App = () => {
-  const isLoggedIn = getCurrentUserUuid();
   return (
-    <div className="App">
-      <h1>Planning Poker</h1>
-      <hr />
-      {!isLoggedIn && <LoginForm />}
-      {isLoggedIn && <UserList />}
-    </div>
+    <Router>
+      <Header />
+      <Route path="/login" component={LoginForm} />
+      <PrivateRoute path="/" exact component={UserList} />
+      <PrivateRoute path="/join-sessions" exact component={JoinSessions} />
+      <PrivateRoute path="/my-sessions" exact component={MySessions} />
+    </Router>
   );
 };
 
-export default connect(
-  null,
-  { sendUserLogin }
-)(App);
+export default App;

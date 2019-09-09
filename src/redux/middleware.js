@@ -1,6 +1,6 @@
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import { SEND_TO_SERVER, USER_LOGIN } from "./actionTypes";
-import { sendUserLogin } from "./actions";
+import { sendUserLogin, currentUserLogIn } from "./actions";
 import { getCurrentUserUuid, getCurrentUserName } from "../util/user";
 
 const webSocketMiddleware = store => {
@@ -36,6 +36,7 @@ const webSocketMiddleware = store => {
       switch (action.message.type) {
         case USER_LOGIN:
           initializeWebsocket();
+          store.dispatch(currentUserLogIn());
           break;
         default:
           break;

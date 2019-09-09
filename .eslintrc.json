@@ -23,6 +23,12 @@
   "rules": {
     "quotes": ["error", "double"],
     "react/jsx-indent": "off",
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "no-shadow": [
+      "error",
+      {
+        "allow": ["sendUserLogin", "currentUserLogIn"]
+      }
+    ]
   }
 }
