@@ -1,8 +1,12 @@
 import { createServer } from "http";
 import { server as WebSocketServer } from "websocket";
-import { USER_LOGIN, USER_LOGOUT } from "../src/redux/actionTypes";
-import { receiveUserListUpdate } from "../src/redux/actions";
+import { USER_LOGIN, USER_LOGOUT, ADD_SESSION, REMOVE_SESSION } from "../src/redux/actionTypes";
+import {
+  receiveUserListUpdate,
+  receiveSessionListUpdate
+} from "../src/redux/actions";
 import { initialState as usersInitialState } from "../src/redux/reducers/users";
+import { initialState as sessionsInitialState } from "../src/redux/reducers/sessions";
 
 const server = new WebSocketServer({
   httpServer: createServer().listen(8000)
@@ -10,6 +14,8 @@ const server = new WebSocketServer({
 
 const clients = {};
 const users = usersInitialState;
+const sessions = sessionsInitialState;
+let nextSessionId = 0;
 
 const sendResponse = response => {
   const serializedResponse = JSON.stringify(response);
@@ -20,6 +26,10 @@ const sendResponse = response => {
 
 const sendUserListUpdate = () => {
   sendResponse(receiveUserListUpdate(users));
+};
+
+const sendSessionListUpdate = () => {
+  sendResponse(receiveSessionListUpdate(sessions));
 };
 
 const addUser = (uuid, parsedMessage) => {
@@ -43,6 +53,28 @@ const removeUser = uuid => {
   sendUserListUpdate();
 };
 
+const addSession = payload => {
+  nextSessionId += 1;
+
+  if (!sessions.idList.includes(nextSessionId)) {
+    sessions.idList.push(nextSessionId);
+    sessions.byId = {
+      ...sessions.byId,
+      [nextSessionId]: {
+        nextSessionId,
+        ...payload
+      }
+    };
+    sendSessionListUpdate();
+  }
+};
+
+const removeSession = id => {
+  delete sessions.byId[id];
+  users.idList = [...sessions.idList.filter(current => current !== id)];
+  sendSessionListUpdate();
+};
+
 const onMessage = (message, uuid) => {
   if (message.type === "utf8") {
     const parsedMessage = JSON.parse(message.utf8Data).message;
@@ -53,6 +85,12 @@ const onMessage = (message, uuid) => {
         break;
       case USER_LOGOUT:
         removeUser(parsedMessage.payload.uuid);
+        break;
+      case ADD_SESSION:
+        addSession(parsedMessage.payload);
+        break;
+      case REMOVE_SESSION:
+        removeSession(parsedMessage.payload.id);
         break;
       default:
         break;

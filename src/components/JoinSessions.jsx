@@ -1,6 +1,23 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
-const JoinSessions = () => {
+const NoSessionsDisplay = () => {
+  return (
+    <div>
+      <h3>Huh, no sessions available. Create one?</h3>
+      <button type="button">Create session</button>
+    </div>
+  );
+};
+
+const JoinSessions = ({ sessions }) => {
+  const { idList } = sessions;
+
+  if (!idList.length) {
+    return <NoSessionsDisplay />;
+  }
+
   return (
     <div>
       <h2>Join Sessions</h2>
@@ -8,4 +25,22 @@ const JoinSessions = () => {
   );
 };
 
-export default JoinSessions;
+const mapStateToProps = state => ({
+  sessions: state.sessions
+});
+
+JoinSessions.propTypes = {
+  sessions: PropTypes.shape({
+    idList: PropTypes.arrayOf(PropTypes.string).isRequired,
+    byId: PropTypes.objectOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired
+      })
+    ).isRequired
+  }).isRequired
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(JoinSessions);

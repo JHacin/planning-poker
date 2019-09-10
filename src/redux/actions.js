@@ -5,7 +5,10 @@ import {
   USER_LIST_UPDATE,
   CURRENT_USER_LOG_IN,
   CURRENT_USER_LOG_OUT,
-  USER_LOGOUT
+  USER_LOGOUT,
+  ADD_SESSION,
+  REMOVE_SESSION,
+  SESSION_LIST_UPDATE
 } from "./actionTypes";
 
 const sendToServer = message => ({
@@ -43,3 +46,21 @@ export const currentUserLogIn = () => ({
 export const currentUserLogOut = () => ({
   type: CURRENT_USER_LOG_OUT
 });
+
+export const sendAddSession = sessionData =>
+  sendToServer({
+    type: ADD_SESSION,
+    payload: { ...sessionData }
+  });
+
+export const sendRemoveSession = id =>
+  sendToServer({
+    type: REMOVE_SESSION,
+    payload: { id }
+  });
+
+export const receiveSessionListUpdate = sessionList =>
+  receiveFromServer({
+    type: SESSION_LIST_UPDATE,
+    payload: { ...sessionList }
+  });

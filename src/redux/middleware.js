@@ -50,6 +50,7 @@ const webSocketMiddleware = store => {
           removeCurrentUserSession();
           break;
         default:
+          socket.send(JSON.stringify(action));
           break;
       }
     }

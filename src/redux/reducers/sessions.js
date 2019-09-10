@@ -1,14 +1,14 @@
-import { RECEIVE_FROM_SERVER, USER_LIST_UPDATE } from "../actionTypes";
+import { RECEIVE_FROM_SERVER, SESSION_LIST_UPDATE } from "../actionTypes";
 
 export const initialState = {
-  uuidList: [],
-  byUuid: {}
+  idList: [],
+  byId: {}
 };
 
-const users = (state = initialState, action) => {
+const sessions = (state = initialState, action) => {
   if (action.type === RECEIVE_FROM_SERVER) {
     switch (action.message.type) {
-      case USER_LIST_UPDATE:
+      case SESSION_LIST_UPDATE:
         return { ...action.message.payload };
       default:
         return state;
@@ -18,4 +18,4 @@ const users = (state = initialState, action) => {
   return state;
 };
 
-export default users;
+export default sessions;
