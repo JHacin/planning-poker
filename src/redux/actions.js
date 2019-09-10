@@ -8,29 +8,33 @@ import {
   USER_LOGOUT
 } from "./actionTypes";
 
-export const sendUserLogin = userData => ({
+const sendToServer = message => ({
   type: SEND_TO_SERVER,
-  message: {
+  message
+});
+
+const receiveFromServer = message => ({
+  type: RECEIVE_FROM_SERVER,
+  message
+});
+
+export const sendUserLogin = userData =>
+  sendToServer({
     type: USER_LOGIN,
     payload: { ...userData }
-  }
-});
+  });
 
-export const sendUserLogout = uuid => ({
-  type: SEND_TO_SERVER,
-  message: {
+export const sendUserLogout = uuid =>
+  sendToServer({
     type: USER_LOGOUT,
     payload: { uuid }
-  }
-});
+  });
 
-export const receiveUserListUpdate = userList => ({
-  type: RECEIVE_FROM_SERVER,
-  message: {
+export const receiveUserListUpdate = userList =>
+  receiveFromServer({
     type: USER_LIST_UPDATE,
     payload: { ...userList }
-  }
-});
+  });
 
 export const currentUserLogIn = () => ({
   type: CURRENT_USER_LOG_IN

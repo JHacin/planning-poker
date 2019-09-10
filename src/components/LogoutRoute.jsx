@@ -3,11 +3,12 @@ import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { sendUserLogout } from "../redux/actions";
+import { getCurrentUserUuid } from "../util/user";
 
 class LogoutRoute extends Component {
   componentDidMount() {
     const { sendUserLogout } = this.props;
-    sendUserLogout();
+    sendUserLogout(getCurrentUserUuid());
   }
 
   render() {

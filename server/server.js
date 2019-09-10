@@ -52,7 +52,7 @@ const onMessage = (message, uuid) => {
         addUser(uuid, parsedMessage);
         break;
       case USER_LOGOUT:
-        removeUser(uuid);
+        removeUser(parsedMessage.payload.uuid);
         break;
       default:
         break;

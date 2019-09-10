@@ -45,6 +45,7 @@ const webSocketMiddleware = store => {
           store.dispatch(currentUserLogIn());
           break;
         case USER_LOGOUT:
+          socket.send(JSON.stringify(action));
           store.dispatch(currentUserLogOut());
           removeCurrentUserSession();
           break;
