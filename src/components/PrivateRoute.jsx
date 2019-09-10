@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, withRouter } from "react-router-dom";
 import { getCurrentUserUuid } from "../util/user";
 
 const PrivateRoute = ({ component: Component, ...otherProps }) => {
@@ -18,4 +18,4 @@ PrivateRoute.propTypes = {
   component: PropTypes.elementType.isRequired
 };
 
-export default PrivateRoute;
+export default withRouter(PrivateRoute);

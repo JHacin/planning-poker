@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { Redirect, withRouter } from "react-router-dom";
 import generateUuid from "uuid/v1";
 import { sendUserLogin } from "../redux/actions";
-import {
-  setCurrentUserName,
-  setCurrentUserUuid
-} from "../util/user";
+import { setCurrentUserName, setCurrentUserUuid } from "../util/user";
 
 class LoginForm extends Component {
   constructor(props) {
@@ -21,7 +18,9 @@ class LoginForm extends Component {
     this.setState({ username });
   };
 
-  handleSubmit = () => {
+  handleSubmit = e => {
+    e.preventDefault();
+
     const { username } = this.state;
     const { sendUserLogin } = this.props;
 
@@ -40,13 +39,16 @@ class LoginForm extends Component {
     return !currentUser.isLoggedIn ? (
       <div>
         <h1>Planning Poker</h1>
-        <form onSubmit={this.handleSubmit} action="/">
-          <input onChange={e => this.handleInputChange(e.target.value)} />
+        <form onSubmit={e => this.handleSubmit(e)} action="/">
+          <input
+            required
+            onChange={e => this.handleInputChange(e.target.value)}
+          />
           <input type="submit" value="Login" />
         </form>
       </div>
     ) : (
-      <Redirect to="/my-sessions">No</Redirect>
+      <Redirect to="/my-sessions" />
     );
   }
 }
@@ -62,7 +64,9 @@ LoginForm.propTypes = {
   }).isRequired
 };
 
-export default connect(
-  mapStateToProps,
-  { sendUserLogin }
-)(LoginForm);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    { sendUserLogin }
+  )(LoginForm)
+);

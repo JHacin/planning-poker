@@ -27,7 +27,7 @@
     "no-shadow": [
       "error",
       {
-        "allow": ["sendUserLogin", "currentUserLogIn"]
+        "allow": ["sendUserLogin", "currentUserLogIn", "sendUserLogout"]
       }
     ]
   }

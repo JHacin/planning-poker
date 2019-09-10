@@ -4,7 +4,8 @@ import {
   USER_LOGIN,
   USER_LIST_UPDATE,
   CURRENT_USER_LOG_IN,
-  CURRENT_USER_LOG_OUT
+  CURRENT_USER_LOG_OUT,
+  USER_LOGOUT
 } from "./actionTypes";
 
 export const sendUserLogin = userData => ({
@@ -12,6 +13,14 @@ export const sendUserLogin = userData => ({
   message: {
     type: USER_LOGIN,
     payload: { ...userData }
+  }
+});
+
+export const sendUserLogout = uuid => ({
+  type: SEND_TO_SERVER,
+  message: {
+    type: USER_LOGOUT,
+    payload: { uuid }
   }
 });
 

@@ -1,10 +1,15 @@
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import { SEND_TO_SERVER, USER_LOGIN } from "./actionTypes";
-import { sendUserLogin, currentUserLogIn } from "./actions";
-import { getCurrentUserUuid, getCurrentUserName } from "../util/user";
+import { SEND_TO_SERVER, USER_LOGIN, USER_LOGOUT } from "./actionTypes";
+import { sendUserLogin, currentUserLogIn, currentUserLogOut } from "./actions";
+import {
+  getCurrentUserUuid,
+  getCurrentUserName,
+  removeCurrentUserSession
+} from "../util/user";
 
 const webSocketMiddleware = store => {
   let socket;
+  const { isLoggedIn } = store.getState().currentUser;
 
   const initializeWebsocket = () => {
     socket = new W3CWebSocket(
@@ -27,7 +32,8 @@ const webSocketMiddleware = store => {
     };
   };
 
-  if (getCurrentUserUuid()) {
+  // Logs user back in when they close and reopen the tab.
+  if (!isLoggedIn && getCurrentUserUuid()) {
     initializeWebsocket();
   }
 
@@ -37,6 +43,10 @@ const webSocketMiddleware = store => {
         case USER_LOGIN:
           initializeWebsocket();
           store.dispatch(currentUserLogIn());
+          break;
+        case USER_LOGOUT:
+          store.dispatch(currentUserLogOut());
+          removeCurrentUserSession();
           break;
         default:
           break;

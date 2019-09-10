@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import JoinSessions from "./components/JoinSessions";
 import MySessions from "./components/MySessions";
 import PrivateRoute from "./components/PrivateRoute";
+import LogoutRoute from "./components/LogoutRoute";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
       <PrivateRoute path="/" exact component={UserList} />
       <PrivateRoute path="/join-sessions" exact component={JoinSessions} />
       <PrivateRoute path="/my-sessions" exact component={MySessions} />
+      <PrivateRoute path="/logout" exact component={LogoutRoute} />
     </Router>
   );
 };

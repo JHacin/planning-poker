@@ -8,9 +8,9 @@ export const initialState = {
 const currentUser = (state = initialState, action) => {
   switch (action.type) {
     case CURRENT_USER_LOG_IN:
-      return !getCurrentUserUuid() ? { isLoggedIn: true } : state;
+      return { isLoggedIn: true };
     case CURRENT_USER_LOG_OUT:
-      return getCurrentUserUuid() ? { isLoggedIn: false } : state;
+      return { isLoggedIn: false };
     default:
       return state;
   }

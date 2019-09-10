@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { server as WebSocketServer } from "websocket";
-import { USER_LOGIN } from "../src/redux/actionTypes";
+import { USER_LOGIN, USER_LOGOUT } from "../src/redux/actionTypes";
 import { receiveUserListUpdate } from "../src/redux/actions";
 import { initialState as usersInitialState } from "../src/redux/reducers/users";
 
@@ -18,6 +18,10 @@ const sendResponse = response => {
   );
 };
 
+const sendUserListUpdate = () => {
+  sendResponse(receiveUserListUpdate(users));
+};
+
 const addUser = (uuid, parsedMessage) => {
   if (!users.uuidList.includes(uuid)) {
     users.uuidList.push(uuid);
@@ -28,7 +32,7 @@ const addUser = (uuid, parsedMessage) => {
         username: parsedMessage.payload.username
       }
     };
-    sendResponse(receiveUserListUpdate(users));
+    sendUserListUpdate();
   }
 };
 
@@ -36,16 +40,19 @@ const removeUser = uuid => {
   delete clients[uuid];
   delete users.byUuid[uuid];
   users.uuidList = [...users.uuidList.filter(current => current !== uuid)];
+  sendUserListUpdate();
 };
 
 const onMessage = (message, uuid) => {
   if (message.type === "utf8") {
     const parsedMessage = JSON.parse(message.utf8Data).message;
     const actionType = parsedMessage.type;
-
     switch (actionType) {
       case USER_LOGIN:
         addUser(uuid, parsedMessage);
+        break;
+      case USER_LOGOUT:
+        removeUser(uuid);
         break;
       default:
         break;
