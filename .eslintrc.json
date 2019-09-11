@@ -24,10 +24,16 @@
     "quotes": ["error", "double"],
     "react/jsx-indent": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "jsx-a11y/no-autofocus": "off",
     "no-shadow": [
       "error",
       {
-        "allow": ["sendUserLogin", "currentUserLogIn", "sendUserLogout"]
+        "allow": [
+          "sendUserLogin",
+          "currentUserLogIn",
+          "sendUserLogout",
+          "sendAddSession"
+        ]
       }
     ]
   }

@@ -7,6 +7,7 @@ import JoinSessions from "./components/JoinSessions";
 import MySessions from "./components/MySessions";
 import PrivateRoute from "./components/PrivateRoute";
 import LogoutRoute from "./components/LogoutRoute";
+import AddSessionForm from "./components/AddSessionForm";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
       <PrivateRoute path="/" exact component={UserList} />
       <PrivateRoute path="/join-sessions" exact component={JoinSessions} />
       <PrivateRoute path="/my-sessions" exact component={MySessions} />
+      <PrivateRoute path="/my-sessions/add" exact component={AddSessionForm} />
       <PrivateRoute path="/logout" exact component={LogoutRoute} />
     </Router>
   );

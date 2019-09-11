@@ -9,7 +9,6 @@ import {
 
 const webSocketMiddleware = store => {
   let socket;
-  const { isLoggedIn } = store.getState().currentUser;
 
   const initializeWebsocket = () => {
     socket = new W3CWebSocket(
@@ -33,15 +32,18 @@ const webSocketMiddleware = store => {
   };
 
   // Logs user back in when they close and reopen the tab.
-  if (!isLoggedIn && getCurrentUserUuid()) {
+  if (!socket && getCurrentUserUuid()) {
     initializeWebsocket();
   }
 
   return next => action => {
     if (action.type === SEND_TO_SERVER) {
+      if (!socket) {
+        initializeWebsocket();
+      }
+
       switch (action.message.type) {
         case USER_LOGIN:
-          initializeWebsocket();
           store.dispatch(currentUserLogIn());
           break;
         case USER_LOGOUT:

@@ -1,6 +1,11 @@
 import { createServer } from "http";
 import { server as WebSocketServer } from "websocket";
-import { USER_LOGIN, USER_LOGOUT, ADD_SESSION, REMOVE_SESSION } from "../src/redux/actionTypes";
+import {
+  USER_LOGIN,
+  USER_LOGOUT,
+  ADD_SESSION,
+  REMOVE_SESSION
+} from "../src/redux/actionTypes";
 import {
   receiveUserListUpdate,
   receiveSessionListUpdate
@@ -61,7 +66,7 @@ const addSession = payload => {
     sessions.byId = {
       ...sessions.byId,
       [nextSessionId]: {
-        nextSessionId,
+        id: nextSessionId,
         ...payload
       }
     };

@@ -1,12 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 const NoSessionsDisplay = () => {
   return (
     <div>
       <h3>Huh, no sessions available. Create one?</h3>
-      <button type="button">Create session</button>
+      <Link to="/my-sessions/add">Create session</Link>
     </div>
   );
 };

@@ -19,17 +19,13 @@ class LoginForm extends Component {
   };
 
   handleSubmit = e => {
-    e.preventDefault();
-
     const { username } = this.state;
     const { sendUserLogin } = this.props;
 
-    if (username !== "") {
-      setCurrentUserUuid(generateUuid());
-      setCurrentUserName(username);
-      sendUserLogin({ username });
-    }
-
+    e.preventDefault();
+    setCurrentUserUuid(generateUuid());
+    setCurrentUserName(username);
+    sendUserLogin({ username });
     this.setState({ username: "" });
   };
 
@@ -39,7 +35,7 @@ class LoginForm extends Component {
     return !currentUser.isLoggedIn ? (
       <div>
         <h1>Planning Poker</h1>
-        <form onSubmit={e => this.handleSubmit(e)} action="/">
+        <form onSubmit={e => this.handleSubmit(e)}>
           <input
             required
             onChange={e => this.handleInputChange(e.target.value)}
