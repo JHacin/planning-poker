@@ -18,4 +18,9 @@ const scaleTypes = [
   }
 ];
 
+export const getTitle = machineName => {
+  const matched = scaleTypes.find(type => type.machineName === machineName);
+  return matched ? matched.title : "";
+};
+
 export default scaleTypes;

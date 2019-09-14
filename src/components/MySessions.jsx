@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { getSessionsCreatedByUser } from "../redux/selectors";
 import { getCurrentUserUuid } from "../util/user";
+import { getTitle } from "../scaleTypes";
 
 const NoSessionsDisplay = () => {
   return (
@@ -25,7 +26,13 @@ const MySessions = ({ mySessions }) => {
       {mySessions.length ? (
         <div>
           {mySessions.map(session => (
-            <div key={session.id}>{session.name}</div>
+            <div key={session.id}>
+              <a href={`sessions/${session.id}`}>{session.name}</a>
+              {" | "}
+              <span>{getTitle(session.scaleType)}</span>
+              {" | "}
+              <span>Status goes here</span>
+            </div>
           ))}
         </div>
       ) : (

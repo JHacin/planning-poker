@@ -99,7 +99,9 @@ class AddSessionForm extends Component {
           />
           <ScaleTypeOptionList onChange={this.handleScaleTypeChange} />
           <button type="button" onClick={this.addUserStory}>
-            + Add another user story
+            + Add
+            {userStories.length ? " another " : " "}
+            user story
           </button>
           {userStories.map(story => (
             <input

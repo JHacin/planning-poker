@@ -22,19 +22,24 @@ const users = usersInitialState;
 const sessions = sessionsInitialState;
 let nextSessionId = 0;
 
-const sendResponse = response => {
+const sendResponse = (response, targetUser = false) => {
   const serializedResponse = JSON.stringify(response);
-  Object.keys(clients).forEach(client =>
-    clients[client].sendUTF(serializedResponse)
-  );
+
+  if (targetUser) {
+    clients[targetUser].sendUTF(serializedResponse);
+  } else {
+    Object.keys(clients).forEach(client =>
+      clients[client].sendUTF(serializedResponse)
+    );
+  }
 };
 
 const sendUserListUpdate = () => {
   sendResponse(receiveUserListUpdate(users));
 };
 
-const sendSessionListUpdate = () => {
-  sendResponse(receiveSessionListUpdate(sessions));
+const sendSessionListUpdate = (targetUser = false) => {
+  sendResponse(receiveSessionListUpdate(sessions), targetUser);
 };
 
 const addUser = (uuid, parsedMessage) => {
@@ -48,7 +53,14 @@ const addUser = (uuid, parsedMessage) => {
       }
     };
     sendUserListUpdate();
+    sendSessionListUpdate(uuid);
   }
+};
+
+const removeSession = id => {
+  delete sessions.byId[id];
+  sessions.idList = [...sessions.idList.filter(current => current !== id)];
+  sendSessionListUpdate();
 };
 
 const removeUser = uuid => {
@@ -72,12 +84,6 @@ const addSession = payload => {
     };
     sendSessionListUpdate();
   }
-};
-
-const removeSession = id => {
-  delete sessions.byId[id];
-  users.idList = [...sessions.idList.filter(current => current !== id)];
-  sendSessionListUpdate();
 };
 
 const onMessage = (message, uuid) => {
