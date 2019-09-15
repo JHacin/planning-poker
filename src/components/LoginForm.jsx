@@ -6,27 +6,30 @@ import generateUuid from "uuid/v1";
 import { sendUserLogin } from "../redux/actions";
 import { setCurrentUserName, setCurrentUserUuid } from "../util/user";
 
+const formInitialState = {
+  username: ""
+};
+
 class LoginForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      username: ""
-    };
+    this.state = { ...formInitialState };
   }
 
   handleInputChange = username => {
     this.setState({ username });
   };
 
-  handleSubmit = e => {
+  handleSubmit = event => {
+    event.preventDefault();
     const { username } = this.state;
     const { sendUserLogin } = this.props;
 
-    e.preventDefault();
     setCurrentUserUuid(generateUuid());
     setCurrentUserName(username);
     sendUserLogin({ username });
-    this.setState({ username: "" });
+
+    this.setState({ ...formInitialState });
   };
 
   render() {

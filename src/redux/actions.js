@@ -8,7 +8,9 @@ import {
   USER_LOGOUT,
   ADD_SESSION,
   REMOVE_SESSION,
-  SESSION_LIST_UPDATE
+  SESSION_LIST_UPDATE,
+  USER_RECONNECT,
+  USER_DISCONNECT
 } from "./actionTypes";
 
 const sendToServer = message => ({
@@ -30,6 +32,18 @@ export const sendUserLogin = userData =>
 export const sendUserLogout = uuid =>
   sendToServer({
     type: USER_LOGOUT,
+    payload: { uuid }
+  });
+
+export const sendUserReconnect = userData =>
+  sendToServer({
+    type: USER_RECONNECT,
+    payload: { ...userData }
+  });
+
+export const receiveUserDisconnect = uuid =>
+  receiveFromServer({
+    type: USER_DISCONNECT,
     payload: { uuid }
   });
 

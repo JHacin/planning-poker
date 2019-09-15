@@ -1,6 +1,16 @@
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import { SEND_TO_SERVER, USER_LOGIN, USER_LOGOUT } from "./actionTypes";
-import { sendUserLogin, currentUserLogIn, currentUserLogOut } from "./actions";
+import {
+  SEND_TO_SERVER,
+  USER_LOGIN,
+  USER_LOGOUT,
+  USER_RECONNECT
+} from "./actionTypes";
+import {
+  sendUserLogin,
+  currentUserLogIn,
+  currentUserLogOut,
+  sendUserReconnect
+} from "./actions";
 import {
   getCurrentUserUuid,
   getCurrentUserName,
@@ -10,15 +20,17 @@ import {
 const webSocketMiddleware = store => {
   let socket;
 
-  const initializeWebsocket = () => {
+  const initializeWebsocket = (reconnect = false) => {
     socket = new W3CWebSocket(
       `ws://localhost:8000?uuid=${getCurrentUserUuid()}`
     );
 
     socket.onopen = () => {
+      const func = reconnect ? sendUserReconnect : sendUserLogin;
+
       socket.send(
         JSON.stringify(
-          sendUserLogin({
+          func({
             uuid: getCurrentUserUuid(),
             username: getCurrentUserName()
           })
@@ -33,7 +45,7 @@ const webSocketMiddleware = store => {
 
   // Logs user back in when they close and reopen the tab.
   if (!socket && getCurrentUserUuid()) {
-    initializeWebsocket();
+    initializeWebsocket(true);
   }
 
   return next => action => {
@@ -44,6 +56,7 @@ const webSocketMiddleware = store => {
 
       switch (action.message.type) {
         case USER_LOGIN:
+        case USER_RECONNECT:
           store.dispatch(currentUserLogIn());
           break;
         case USER_LOGOUT:

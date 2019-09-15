@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { getSessionsWithFullData } from "../redux/selectors";
 import { getTitle } from "../scaleTypes";
@@ -14,48 +14,44 @@ const NoSessionsDisplay = () => {
   );
 };
 
-const JoinSessions = ({ sessions }) => {
+const SessionList = ({ sessions }) => {
   const { idList, byId } = sessions;
 
-  if (!idList || !idList.length) {
-    return <NoSessionsDisplay />;
-  }
+  const ListItems = () =>
+    idList.map(id => {
+      const { name, scaleType, ownerName, id: sessionId } = byId[id];
+
+      return (
+        <li key={sessionId}>
+          <p>
+            <strong>Name: </strong>
+            {name}
+          </p>
+          <p>
+            <strong>Scale type: </strong>
+            {getTitle(scaleType)}
+          </p>
+          <p>
+            <strong>Moderated by: </strong>
+            {ownerName}
+          </p>
+        </li>
+      );
+    });
 
   return (
-    <div>
-      <h3>Available sessions to join</h3>
-      <ul>
-        {idList.map(id => (
-          <li>
-            <p>
-              <strong>Name: </strong>
-              {byId[id].name}
-            </p>
-            <p>
-              <strong>Scale type: </strong>
-              {getTitle(byId[id].scaleType)}
-            </p>
-            <p>
-              <strong>Moderated by: </strong>
-              {byId[id].ownerName}
-            </p>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul>
+      <ListItems />
+    </ul>
   );
 };
 
-const mapStateToProps = state => ({
-  sessions: getSessionsWithFullData(state)
-});
-
-JoinSessions.propTypes = {
+SessionList.propTypes = {
   sessions: PropTypes.shape({
-    idList: PropTypes.arrayOf(PropTypes.string).isRequired,
+    idList: PropTypes.arrayOf(PropTypes.number).isRequired,
     byId: PropTypes.objectOf(
       PropTypes.shape({
-        id: PropTypes.string.isRequired,
+        id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
         owner: PropTypes.string.isRequired,
         scaleType: PropTypes.string.isRequired,
@@ -65,7 +61,26 @@ JoinSessions.propTypes = {
   }).isRequired
 };
 
-export default connect(
-  mapStateToProps,
-  null
-)(JoinSessions);
+const JoinSessions = ({ sessions }) => {
+  return !sessions.idList || !sessions.idList.length ? (
+    <NoSessionsDisplay />
+  ) : (
+    <div>
+      <h3>Available sessions to join</h3>
+      <SessionList sessions={sessions} />
+    </div>
+  );
+};
+
+const mapStateToProps = state => ({
+  sessions: getSessionsWithFullData(state)
+});
+
+JoinSessions.propTypes = { ...SessionList.propTypes };
+
+export default withRouter(
+  connect(
+    mapStateToProps,
+    null
+  )(JoinSessions)
+);

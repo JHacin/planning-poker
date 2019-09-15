@@ -26,41 +26,32 @@ ScaleTypeOptionList.propTypes = {
   onChange: PropTypes.func.isRequired
 };
 
+const formInitialState = {
+  name: "",
+  scaleType: SCALE_FIBONACCI,
+  userStories: []
+};
+
 class AddSessionForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      name: "",
-      scaleType: SCALE_FIBONACCI,
-      userStories: []
-    };
+    this.state = { ...formInitialState };
   }
 
-  handleNameChange = name => {
-    this.setState({ name });
-  };
+  handleNameChange = name => this.setState({ name });
 
-  handleScaleTypeChange = scaleType => {
-    this.setState({ scaleType });
-  };
+  handleScaleTypeChange = scaleType => this.setState({ scaleType });
 
-  handleSubmit = e => {
-    const { name, scaleType, userStories } = this.state;
+  handleSubmit = event => {
+    event.preventDefault();
     const { sendAddSession } = this.props;
 
-    e.preventDefault();
     sendAddSession({
-      name,
-      scaleType,
-      userStories,
+      ...this.state,
       owner: getCurrentUserUuid()
     });
 
-    this.setState({
-      name: "",
-      scaleType: SCALE_FIBONACCI,
-      userStories: []
-    });
+    this.setState({ ...formInitialState });
   };
 
   addUserStory = () => {
@@ -105,6 +96,7 @@ class AddSessionForm extends Component {
           </button>
           {userStories.map(story => (
             <input
+              required
               autoFocus
               key={story.id}
               onChange={e =>
@@ -112,7 +104,11 @@ class AddSessionForm extends Component {
               }
             />
           ))}
-          <input type="submit" value="Start" />
+          <input
+            type="submit"
+            value="Start"
+            hidden={!userStories.length ? "hidden" : ""}
+          />
         </form>
       </div>
     );

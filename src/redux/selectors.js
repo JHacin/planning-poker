@@ -1,3 +1,5 @@
+import { initialState as sessionsInitialState } from "./reducers/sessions";
+
 export const sessionsExist = state => state.sessions.idList.length;
 
 export const getSessionById = (state, sessionId) => {
@@ -41,5 +43,6 @@ export const getSessionsWithFullData = state => {
     });
     return sessions;
   }
-  return {};
+
+  return { ...sessionsInitialState };
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { getSessionsCreatedByUser } from "../redux/selectors";
 import { getCurrentUserUuid } from "../util/user";
@@ -15,34 +15,30 @@ const NoSessionsDisplay = () => {
   );
 };
 
-const mapStateToProps = state => ({
-  mySessions: getSessionsCreatedByUser(state, getCurrentUserUuid())
-});
+const SessionList = ({ mySessions }) => {
+  const ListItems = () =>
+    mySessions.map(session => {
+      const { id, name, scaleType } = session;
 
-const MySessions = ({ mySessions }) => {
+      return (
+        <div key={id}>
+          <a href={`sessions/${id}`}>{name}</a>
+          {" | "}
+          <span>{getTitle(scaleType)}</span>
+          {" | "}
+          <span>Status goes here</span>
+        </div>
+      );
+    });
+
   return (
     <div>
-      <h2>My Sessions</h2>
-      {mySessions.length ? (
-        <div>
-          {mySessions.map(session => (
-            <div key={session.id}>
-              <a href={`sessions/${session.id}`}>{session.name}</a>
-              {" | "}
-              <span>{getTitle(session.scaleType)}</span>
-              {" | "}
-              <span>Status goes here</span>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <NoSessionsDisplay />
-      )}
+      <ListItems />
     </div>
   );
 };
 
-MySessions.propTypes = {
+SessionList.propTypes = {
   mySessions: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -58,7 +54,28 @@ MySessions.propTypes = {
   ).isRequired
 };
 
-export default connect(
-  mapStateToProps,
-  null
-)(MySessions);
+const MySessions = ({ mySessions }) => {
+  return (
+    <div>
+      <h2>My Sessions</h2>
+      {mySessions.length ? (
+        <SessionList mySessions={mySessions} />
+      ) : (
+        <NoSessionsDisplay />
+      )}
+    </div>
+  );
+};
+
+MySessions.propTypes = { ...SessionList.propTypes };
+
+const mapStateToProps = state => ({
+  mySessions: getSessionsCreatedByUser(state, getCurrentUserUuid())
+});
+
+export default withRouter(
+  connect(
+    mapStateToProps,
+    null
+  )(MySessions)
+);
