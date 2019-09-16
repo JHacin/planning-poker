@@ -10,7 +10,8 @@ import {
   REMOVE_SESSION,
   SESSION_LIST_UPDATE,
   USER_RECONNECT,
-  USER_DISCONNECT
+  USER_DISCONNECT,
+  GENERATE_NEXT_SESSION_ID
 } from "./actionTypes";
 
 const sendToServer = message => ({
@@ -60,6 +61,11 @@ export const currentUserLogIn = () => ({
 export const currentUserLogOut = () => ({
   type: CURRENT_USER_LOG_OUT
 });
+
+export const sendGenerateNextSessionId = () =>
+  sendToServer({
+    type: GENERATE_NEXT_SESSION_ID
+  });
 
 export const sendAddSession = sessionData =>
   sendToServer({

@@ -2,7 +2,8 @@ import { RECEIVE_FROM_SERVER, SESSION_LIST_UPDATE } from "../actionTypes";
 
 export const initialState = {
   idList: [],
-  byId: {}
+  byId: {},
+  nextSessionId: 0
 };
 
 const sessions = (state = initialState, action) => {

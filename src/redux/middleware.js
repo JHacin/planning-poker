@@ -41,6 +41,10 @@ const webSocketMiddleware = store => {
     socket.onmessage = message => {
       store.dispatch(JSON.parse(message.data));
     };
+
+    socket.onclose = () => {
+      console.log("Terminated WebSocket connection.");
+    };
   };
 
   // Logs user back in when they close and reopen the tab.
@@ -48,24 +52,43 @@ const webSocketMiddleware = store => {
     initializeWebsocket(true);
   }
 
+  const sendToWebsocket = message => {
+    const payload = JSON.stringify(message);
+
+    if (!socket) {
+      initializeWebsocket();
+    }
+
+    if (socket.readyState !== 1) {
+      socket.onopen = () => socket.send(payload);
+    } else {
+      socket.send(payload);
+    }
+  };
+
+  const closeSocket = () => {
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+  };
+
   return next => action => {
     if (action.type === SEND_TO_SERVER) {
-      if (!socket) {
-        initializeWebsocket();
-      }
-
       switch (action.message.type) {
         case USER_LOGIN:
         case USER_RECONNECT:
+          sendToWebsocket(action);
           store.dispatch(currentUserLogIn());
           break;
         case USER_LOGOUT:
-          socket.send(JSON.stringify(action));
+          sendToWebsocket(action);
           store.dispatch(currentUserLogOut());
           removeCurrentUserSession();
+          closeSocket();
           break;
         default:
-          socket.send(JSON.stringify(action));
+          sendToWebsocket(action);
           break;
       }
     }

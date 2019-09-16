@@ -4,7 +4,11 @@ import { connect } from "react-redux";
 import { Redirect, withRouter } from "react-router-dom";
 import generateUuid from "uuid/v1";
 import { sendUserLogin } from "../redux/actions";
-import { setCurrentUserName, setCurrentUserUuid } from "../util/user";
+import {
+  setCurrentUserName,
+  setCurrentUserUuid,
+  getCurrentUserUuid
+} from "../util/user";
 
 const formInitialState = {
   username: ""
@@ -27,7 +31,7 @@ class LoginForm extends Component {
 
     setCurrentUserUuid(generateUuid());
     setCurrentUserName(username);
-    sendUserLogin({ username });
+    sendUserLogin({ uuid: getCurrentUserUuid(), username });
 
     this.setState({ ...formInitialState });
   };

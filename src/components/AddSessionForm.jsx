@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
-import { sendAddSession } from "../redux/actions";
+import { withRouter, Redirect } from "react-router-dom";
+import { sendAddSession, sendGenerateNextSessionId } from "../redux/actions";
 import scaleTypes from "../scaleTypes";
 import { SCALE_FIBONACCI } from "../constants";
 import { getCurrentUserUuid } from "../util/user";
@@ -29,7 +29,8 @@ ScaleTypeOptionList.propTypes = {
 const formInitialState = {
   name: "",
   scaleType: SCALE_FIBONACCI,
-  userStories: []
+  userStories: [],
+  submitted: false
 };
 
 class AddSessionForm extends Component {
@@ -38,20 +39,27 @@ class AddSessionForm extends Component {
     this.state = { ...formInitialState };
   }
 
+  componentDidMount() {
+    const { sendGenerateNextSessionId } = this.props;
+    sendGenerateNextSessionId();
+  }
+
   handleNameChange = name => this.setState({ name });
 
   handleScaleTypeChange = scaleType => this.setState({ scaleType });
 
   handleSubmit = event => {
     event.preventDefault();
-    const { sendAddSession } = this.props;
+    const { sendAddSession, nextSessionId } = this.props;
+    const { submitted, ...restOfState } = this.state;
 
     sendAddSession({
-      ...this.state,
+      ...restOfState,
+      id: nextSessionId,
       owner: getCurrentUserUuid()
     });
 
-    this.setState({ ...formInitialState });
+    this.setState({ submitted: true });
   };
 
   addUserStory = () => {
@@ -78,7 +86,12 @@ class AddSessionForm extends Component {
   };
 
   render() {
-    const { userStories } = this.state;
+    const { userStories, submitted } = this.state;
+    const { nextSessionId } = this.props;
+
+    if (submitted) {
+      return <Redirect to={`/sessions/${nextSessionId}`} />;
+    }
 
     return (
       <div>
@@ -115,13 +128,19 @@ class AddSessionForm extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  nextSessionId: state.sessions.nextSessionId
+});
+
 AddSessionForm.propTypes = {
-  sendAddSession: PropTypes.func.isRequired
+  nextSessionId: PropTypes.number.isRequired,
+  sendAddSession: PropTypes.func.isRequired,
+  sendGenerateNextSessionId: PropTypes.func.isRequired
 };
 
 export default withRouter(
   connect(
-    null,
-    { sendAddSession }
+    mapStateToProps,
+    { sendAddSession, sendGenerateNextSessionId }
   )(AddSessionForm)
 );

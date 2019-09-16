@@ -5,7 +5,8 @@ import {
   USER_LOGOUT,
   ADD_SESSION,
   REMOVE_SESSION,
-  USER_RECONNECT
+  USER_RECONNECT,
+  GENERATE_NEXT_SESSION_ID
 } from "../src/redux/actionTypes";
 import {
   receiveUserListUpdate,
@@ -13,7 +14,10 @@ import {
 } from "../src/redux/actions";
 import { initialState as usersInitialState } from "../src/redux/reducers/users";
 import { initialState as sessionsInitialState } from "../src/redux/reducers/sessions";
-import { STATUS_DISCONNECTED, STATUS_CONNECTED } from "../src/constants";
+import {
+  USER_STATUS_DISCONNECTED,
+  USER_STATUS_CONNECTED
+} from "../src/constants";
 
 const server = new WebSocketServer({
   httpServer: createServer().listen(8000)
@@ -22,16 +26,20 @@ const server = new WebSocketServer({
 const clients = {};
 const users = { ...usersInitialState };
 const sessions = { ...sessionsInitialState };
-let nextSessionId = 0;
 
 const sendResponse = (response, targetUser = false) => {
+  const message = JSON.stringify(response);
+
   if (targetUser) {
-    clients[targetUser].sendUTF(JSON.stringify(response));
+    clients[targetUser].sendUTF(message);
   } else {
-    Object.keys(clients).forEach(client =>
-      clients[client].sendUTF(JSON.stringify(response))
-    );
+    Object.keys(clients).forEach(client => clients[client].sendUTF(message));
   }
+};
+
+const generateNextSessionId = targetUser => {
+  sessions.nextSessionId += 1;
+  sendResponse(receiveSessionListUpdate(sessions), targetUser);
 };
 
 const sendUserListUpdate = () => {
@@ -53,7 +61,7 @@ const addUser = (uuid, parsedMessage) => {
       }
     };
   }
-  users.byUuid[uuid].connectionStatus = STATUS_CONNECTED;
+  users.byUuid[uuid].connectionStatus = USER_STATUS_CONNECTED;
   sendUserListUpdate();
   sendSessionListUpdate(uuid);
 };
@@ -84,21 +92,18 @@ const removeUser = uuid => {
 
 const handleDisconnected = uuid => {
   if (users.uuidList.includes(uuid)) {
-    users.byUuid[uuid].connectionStatus = STATUS_DISCONNECTED;
+    users.byUuid[uuid].connectionStatus = USER_STATUS_DISCONNECTED;
   }
 
   sendUserListUpdate();
 };
 
 const addSession = payload => {
-  nextSessionId += 1;
-
-  if (!sessions.idList.includes(nextSessionId)) {
-    sessions.idList.push(nextSessionId);
+  if (!sessions.idList.includes(payload.id)) {
+    sessions.idList.push(payload.id);
     sessions.byId = {
       ...sessions.byId,
-      [nextSessionId]: {
-        id: nextSessionId,
+      [payload.id]: {
         ...payload
       }
     };
@@ -118,6 +123,9 @@ const onMessage = (message, uuid) => {
         break;
       case USER_LOGOUT:
         removeUser(parsedMessage.payload.uuid);
+        break;
+      case GENERATE_NEXT_SESSION_ID:
+        generateNextSessionId(uuid);
         break;
       case ADD_SESSION:
         addSession(parsedMessage.payload);
