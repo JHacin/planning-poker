@@ -43,7 +43,7 @@ SessionList.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
-      owner: PropTypes.string.isRequired,
+      moderator: PropTypes.string.isRequired,
       userStories: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,

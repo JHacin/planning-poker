@@ -6,14 +6,21 @@ import {
   ADD_SESSION,
   REMOVE_SESSION,
   USER_RECONNECT,
-  GENERATE_NEXT_SESSION_ID
+  GENERATE_NEXT_SESSION_ID,
+  JOIN_SESSION
 } from "../src/redux/actionTypes";
 import {
   receiveUserListUpdate,
   receiveSessionListUpdate
 } from "../src/redux/actions";
-import { initialState as usersInitialState } from "../src/redux/reducers/users";
-import { initialState as sessionsInitialState } from "../src/redux/reducers/sessions";
+import {
+  userListInitialState,
+  userInitialState
+} from "../src/redux/reducers/users";
+import {
+  sessionListInitialState,
+  sessionInitialState
+} from "../src/redux/reducers/sessions";
 import {
   USER_STATUS_DISCONNECTED,
   USER_STATUS_CONNECTED
@@ -24,8 +31,8 @@ const server = new WebSocketServer({
 });
 
 const clients = {};
-const users = { ...usersInitialState };
-const sessions = { ...sessionsInitialState };
+const users = { ...userListInitialState };
+const sessions = { ...sessionListInitialState };
 
 const sendResponse = (response, targetUser = false) => {
   const message = JSON.stringify(response);
@@ -56,6 +63,7 @@ const addUser = (uuid, parsedMessage) => {
     users.byUuid = {
       ...users.byUuid,
       [uuid]: {
+        ...userInitialState,
         uuid,
         username: parsedMessage.payload.username
       }
@@ -81,7 +89,7 @@ const removeUser = uuid => {
   users.uuidList = [...users.uuidList.filter(current => current !== uuid)];
 
   sessions.idList.forEach(sessionId => {
-    if (sessions.byId[sessionId].owner === uuid) {
+    if (sessions.byId[sessionId].moderator === uuid) {
       removeSession(sessionId, false);
     }
   });
@@ -104,9 +112,17 @@ const addSession = payload => {
     sessions.byId = {
       ...sessions.byId,
       [payload.id]: {
+        ...sessionInitialState,
         ...payload
       }
     };
+    sendSessionListUpdate();
+  }
+};
+
+const updateSession = payload => {
+  if (sessions.byId[payload.sessionId].moderator !== payload.userId) {
+    sessions.byId[payload.sessionId].participants.push(payload.userId);
     sendSessionListUpdate();
   }
 };
@@ -132,6 +148,9 @@ const onMessage = (message, uuid) => {
         break;
       case REMOVE_SESSION:
         removeSession(parsedMessage.payload.id);
+        break;
+      case JOIN_SESSION:
+        updateSession(parsedMessage.payload);
         break;
       default:
         break;

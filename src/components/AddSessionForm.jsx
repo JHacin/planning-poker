@@ -6,6 +6,7 @@ import { sendAddSession, sendGenerateNextSessionId } from "../redux/actions";
 import scaleTypes from "../scaleTypes";
 import { SCALE_FIBONACCI } from "../constants";
 import { getCurrentUserUuid } from "../util/user";
+import { userStoryInitialState } from "../redux/reducers/sessions";
 
 const ScaleTypeOptionList = ({ onChange }) => {
   return (
@@ -56,7 +57,7 @@ class AddSessionForm extends Component {
     sendAddSession({
       ...restOfState,
       id: nextSessionId,
-      owner: getCurrentUserUuid()
+      moderator: getCurrentUserUuid()
     });
 
     this.setState({ submitted: true });
@@ -67,8 +68,8 @@ class AddSessionForm extends Component {
       userStories: [
         ...prevState.userStories,
         {
-          id: prevState.userStories.length + 1,
-          text: ""
+          ...userStoryInitialState,
+          id: prevState.userStories.length + 1
         }
       ]
     }));

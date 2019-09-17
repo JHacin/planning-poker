@@ -1,4 +1,4 @@
-import { initialState as sessionsInitialState } from "./reducers/sessions";
+import { sessionListInitialState } from "./reducers/sessions";
 
 export const sessionsExist = state => state.sessions.idList.length;
 
@@ -11,7 +11,7 @@ export const getSessionById = (state, sessionId) => {
 export const getSessionsCreatedByUser = (state, userId) => {
   return sessionsExist(state)
     ? state.sessions.idList
-        .filter(id => getSessionById(state, id).owner === userId)
+        .filter(id => getSessionById(state, id).moderator === userId)
         .map(sessionId => getSessionById(state, sessionId))
     : [];
 };
@@ -22,13 +22,13 @@ export const getUserNameById = (state, userId) => {
     : "";
 };
 
-export const getSessionOwner = (state, sessionId) => {
+export const getSessionModerator = (state, sessionId) => {
   return sessionsExist(state) &&
     Object.prototype.hasOwnProperty.call(
       getSessionById(state, sessionId),
-      "owner"
+      "moderator"
     )
-    ? getSessionById(state, sessionId).owner
+    ? getSessionById(state, sessionId).moderator
     : false;
 };
 
@@ -36,13 +36,13 @@ export const getSessionsWithFullData = state => {
   if (sessionsExist(state)) {
     const sessions = { ...state.sessions };
     state.sessions.idList.forEach(id => {
-      sessions.byId[id].ownerName = getUserNameById(
+      sessions.byId[id].moderatorName = getUserNameById(
         state,
-        getSessionOwner(state, id)
+        getSessionModerator(state, id)
       );
     });
     return sessions;
   }
 
-  return { ...sessionsInitialState };
+  return { ...sessionListInitialState };
 };

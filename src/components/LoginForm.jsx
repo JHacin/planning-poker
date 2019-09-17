@@ -10,14 +10,12 @@ import {
   getCurrentUserUuid
 } from "../util/user";
 
-const formInitialState = {
-  username: ""
-};
-
 class LoginForm extends Component {
   constructor(props) {
     super(props);
-    this.state = { ...formInitialState };
+    this.state = {
+      username: ""
+    };
   }
 
   handleInputChange = username => {
@@ -33,7 +31,7 @@ class LoginForm extends Component {
     setCurrentUserName(username);
     sendUserLogin({ uuid: getCurrentUserUuid(), username });
 
-    this.setState({ ...formInitialState });
+    this.setState({ username: "" });
   };
 
   render() {

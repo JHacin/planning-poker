@@ -3,47 +3,33 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { SESSION_STATUS_WAITING } from "../constants";
+import { joinSession, updateSessionStatus } from "../redux/actions";
+import { getCurrentUserUuid } from "../util/user";
 
 class Session extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isInitialized: false,
-      status: null,
-      id: null,
-      name: "",
-      scaleType: "",
-      userStories: [],
-      owner: ""
-    };
+  componentDidMount() {
+    const {
+      joinSession,
+      match: {
+        params: { id: sessionId }
+      }
+    } = this.props;
+
+    joinSession(sessionId, getCurrentUserUuid());
   }
-
-  static getDerivedStateFromProps(props, state) {
-    if (!state.isInitialized && props.session) {
-      return {
-        ...props.session,
-        isInitialized: true,
-        status: SESSION_STATUS_WAITING
-      };
-    }
-
-    return { ...state };
-  }
-
-  initializeSessionState = props => {
-    this.setState({ ...props });
-  };
 
   render() {
-    const { isInitialized, status, name } = this.state;
+    const { session } = this.props;
 
-    if (!isInitialized) {
+    if (!session) {
       return (
         <div>
           <span>Loading...</span>
         </div>
       );
     }
+
+    const { status, name } = session;
 
     switch (status) {
       case SESSION_STATUS_WAITING:
@@ -64,18 +50,29 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 Session.propTypes = {
+  joinSession: PropTypes.func.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired
+    }).isRequired
+  }).isRequired,
   session: PropTypes.shape({
     id: PropTypes.number.isRequired,
+    status: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     scaleType: PropTypes.string.isRequired,
     userStories: PropTypes.array.isRequired,
-    owner: PropTypes.string.isRequired
-  }).isRequired
+    moderator: PropTypes.string.isRequired
+  })
+};
+
+Session.defaultProps = {
+  session: undefined
 };
 
 export default withRouter(
   connect(
     mapStateToProps,
-    null
+    { joinSession, updateSessionStatus }
   )(Session)
 );

@@ -11,7 +11,9 @@ import {
   SESSION_LIST_UPDATE,
   USER_RECONNECT,
   USER_DISCONNECT,
-  GENERATE_NEXT_SESSION_ID
+  GENERATE_NEXT_SESSION_ID,
+  JOIN_SESSION,
+  UPDATE_SESSION_STATUS
 } from "./actionTypes";
 
 const sendToServer = message => ({
@@ -83,4 +85,16 @@ export const receiveSessionListUpdate = sessionList =>
   receiveFromServer({
     type: SESSION_LIST_UPDATE,
     payload: { ...sessionList }
+  });
+
+export const joinSession = (sessionId, userId) =>
+  sendToServer({
+    type: JOIN_SESSION,
+    payload: { sessionId, userId }
+  });
+
+export const updateSessionStatus = (sessionId, status) =>
+  sendToServer({
+    type: UPDATE_SESSION_STATUS,
+    payload: { sessionId, status }
   });

@@ -1,11 +1,11 @@
 import { CURRENT_USER_LOG_IN, CURRENT_USER_LOG_OUT } from "../actionTypes";
 import { getCurrentUserUuid } from "../../util/user";
 
-export const initialState = {
+export const currentUserInitialState = {
   isLoggedIn: getCurrentUserUuid() !== null
 };
 
-const currentUser = (state = initialState, action) => {
+const currentUser = (state = currentUserInitialState, action) => {
   switch (action.type) {
     case CURRENT_USER_LOG_IN:
       return { isLoggedIn: true };

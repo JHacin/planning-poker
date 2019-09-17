@@ -19,13 +19,15 @@ const SessionList = ({ sessions }) => {
 
   const ListItems = () =>
     idList.map(id => {
-      const { name, scaleType, ownerName, id: sessionId } = byId[id];
+      const { name, scaleType, moderatorName, id: sessionId } = byId[id];
 
       return (
         <li key={sessionId}>
           <p>
-            <strong>Name: </strong>
-            {name}
+            <a href={`/sessions/${sessionId}`}>
+              <strong>Name: </strong>
+              {name}
+            </a>
           </p>
           <p>
             <strong>Scale type: </strong>
@@ -33,7 +35,7 @@ const SessionList = ({ sessions }) => {
           </p>
           <p>
             <strong>Moderated by: </strong>
-            {ownerName}
+            {moderatorName}
           </p>
         </li>
       );
@@ -53,9 +55,9 @@ SessionList.propTypes = {
       PropTypes.shape({
         id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
-        owner: PropTypes.string.isRequired,
+        moderator: PropTypes.string.isRequired,
         scaleType: PropTypes.string.isRequired,
-        ownerName: PropTypes.string.isRequired
+        moderatorName: PropTypes.string.isRequired
       })
     ).isRequired
   }).isRequired

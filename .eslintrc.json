@@ -33,7 +33,8 @@
           "currentUserLogIn",
           "sendUserLogout",
           "sendAddSession",
-          "sendGenerateNextSessionId"
+          "sendGenerateNextSessionId",
+          "joinSession"
         ]
       }
     ]
