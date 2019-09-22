@@ -34,7 +34,8 @@
           "sendUserLogout",
           "sendAddSession",
           "sendGenerateNextSessionId",
-          "joinSession"
+          "joinSession",
+          "updateSessionStatus"
         ]
       }
     ]

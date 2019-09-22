@@ -7,7 +7,8 @@ import {
   REMOVE_SESSION,
   USER_RECONNECT,
   GENERATE_NEXT_SESSION_ID,
-  JOIN_SESSION
+  JOIN_SESSION,
+  UPDATE_SESSION_STATUS
 } from "../src/redux/actionTypes";
 import {
   receiveUserListUpdate,
@@ -23,7 +24,9 @@ import {
 } from "../src/redux/reducers/sessions";
 import {
   USER_STATUS_DISCONNECTED,
-  USER_STATUS_CONNECTED
+  USER_STATUS_CONNECTED,
+  SESSION_STATUS_WAITING_FOR_PARTICIPANTS,
+  SESSION_STATUS_PENDING_LAUNCH
 } from "../src/constants";
 
 const server = new WebSocketServer({
@@ -57,8 +60,28 @@ const sendSessionListUpdate = (targetUser = false) => {
   sendResponse(receiveSessionListUpdate(sessions), targetUser);
 };
 
+const userExists = uuid => {
+  return users.uuidList.includes(uuid);
+};
+
+const userIsParticipant = uuid => {
+  return users.byUuid[uuid].participantIn;
+};
+
+const sessionExists = id => {
+  return sessions.idList.includes(id);
+};
+
+const getSessionModerator = sessionId => {
+  return sessions.byId[sessionId].moderator;
+};
+
+const sessionIncludesParticipant = (sessionId, userId) => {
+  return sessions.byId[sessionId].participants.includes(userId);
+};
+
 const addUser = (uuid, parsedMessage) => {
-  if (!users.uuidList.includes(uuid)) {
+  if (!userExists(uuid)) {
     users.uuidList.push(uuid);
     users.byUuid = {
       ...users.byUuid,
@@ -69,7 +92,9 @@ const addUser = (uuid, parsedMessage) => {
       }
     };
   }
+
   users.byUuid[uuid].connectionStatus = USER_STATUS_CONNECTED;
+
   sendUserListUpdate();
   sendSessionListUpdate(uuid);
 };
@@ -83,48 +108,86 @@ const removeSession = (id, sendUpdate = true) => {
   }
 };
 
-const removeUser = uuid => {
-  delete clients[uuid];
-  delete users.byUuid[uuid];
-  users.uuidList = [...users.uuidList.filter(current => current !== uuid)];
-
+const removeSessionsModeratedBy = uuid => {
   sessions.idList.forEach(sessionId => {
     if (sessions.byId[sessionId].moderator === uuid) {
       removeSession(sessionId, false);
     }
   });
+};
+
+const removeUser = uuid => {
+  delete clients[uuid];
+  delete users.byUuid[uuid];
+  users.uuidList = [...users.uuidList.filter(current => current !== uuid)];
+  removeSessionsModeratedBy(uuid);
 
   sendUserListUpdate();
   sendSessionListUpdate();
 };
 
+const removeUserFromSession = uuid => {
+  const userParticipantIn = userIsParticipant(uuid);
+  const participants = sessions.byId[userParticipantIn].participants.filter(
+    participant => participant !== uuid
+  );
+
+  sessions.byId[userParticipantIn].participants = [...participants];
+
+  if (!participants.length) {
+    sessions.byId[
+      userParticipantIn
+    ].status = SESSION_STATUS_WAITING_FOR_PARTICIPANTS;
+  }
+};
+
 const handleDisconnected = uuid => {
-  if (users.uuidList.includes(uuid)) {
+  if (userExists(uuid)) {
     users.byUuid[uuid].connectionStatus = USER_STATUS_DISCONNECTED;
+
+    if (userIsParticipant(uuid)) {
+      removeUserFromSession(uuid);
+    }
   }
 
   sendUserListUpdate();
+  sendSessionListUpdate();
 };
 
 const addSession = payload => {
-  if (!sessions.idList.includes(payload.id)) {
+  if (!sessionExists(payload.id)) {
     sessions.idList.push(payload.id);
     sessions.byId = {
       ...sessions.byId,
       [payload.id]: {
         ...sessionInitialState,
-        ...payload
+        ...payload,
+        status: SESSION_STATUS_WAITING_FOR_PARTICIPANTS
       }
     };
     sendSessionListUpdate();
   }
 };
 
-const updateSession = payload => {
-  if (sessions.byId[payload.sessionId].moderator !== payload.userId) {
-    sessions.byId[payload.sessionId].participants.push(payload.userId);
-    sendSessionListUpdate();
+const addUserToSession = (sessionId, userId) => {
+  if (getSessionModerator(sessionId) !== userId) {
+    if (!sessionIncludesParticipant(sessionId, userId)) {
+      sessions.byId[sessionId].participants.push(userId);
+      users.byUuid[userId].participantIn = sessionId;
+
+      if (
+        sessions.byId[sessionId].status ===
+        SESSION_STATUS_WAITING_FOR_PARTICIPANTS
+      ) {
+        sessions.byId[sessionId].status = SESSION_STATUS_PENDING_LAUNCH;
+      }
+    }
+  } else {
+    users.byUuid[userId].moderatorOf = sessionId;
   }
+
+  sendUserListUpdate();
+  sendSessionListUpdate();
 };
 
 const onMessage = (message, uuid) => {
@@ -149,8 +212,16 @@ const onMessage = (message, uuid) => {
       case REMOVE_SESSION:
         removeSession(parsedMessage.payload.id);
         break;
+      case UPDATE_SESSION_STATUS:
+        sessions.byId[parsedMessage.payload.sessionId].status =
+          parsedMessage.payload.status;
+        sendSessionListUpdate();
+        break;
       case JOIN_SESSION:
-        updateSession(parsedMessage.payload);
+        addUserToSession(
+          parsedMessage.payload.sessionId,
+          parsedMessage.payload.userId
+        );
         break;
       default:
         break;

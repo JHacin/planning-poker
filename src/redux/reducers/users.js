@@ -10,6 +10,8 @@ export const userInitialState = {
   uuid: "",
   username: "",
   connectionStatus: USER_STATUS_DISCONNECTED,
+  moderatorOf: null,
+  participantIn: null
 };
 
 const users = (state = userListInitialState, action) => {
