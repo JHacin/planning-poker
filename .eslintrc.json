@@ -35,7 +35,8 @@
           "sendAddSession",
           "sendGenerateNextSessionId",
           "joinSession",
-          "updateSessionStatus"
+          "updateSessionStatus",
+          "provideEstimate"
         ]
       }
     ]

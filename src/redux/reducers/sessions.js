@@ -19,7 +19,10 @@ export const sessionInitialState = {
 
 export const userStoryInitialState = {
   id: 0,
-  text: ""
+  text: "",
+  estimatesGiven: [],
+  average: null,
+  receivedAllEstimates: false
 };
 
 const sessions = (state = sessionListInitialState, action) => {

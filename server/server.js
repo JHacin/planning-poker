@@ -8,7 +8,8 @@ import {
   USER_RECONNECT,
   GENERATE_NEXT_SESSION_ID,
   JOIN_SESSION,
-  UPDATE_SESSION_STATUS
+  UPDATE_SESSION_STATUS,
+  PROVIDE_ESTIMATE
 } from "../src/redux/actionTypes";
 import {
   receiveUserListUpdate,
@@ -28,6 +29,7 @@ import {
   SESSION_STATUS_WAITING_FOR_PARTICIPANTS,
   SESSION_STATUS_PENDING_LAUNCH
 } from "../src/constants";
+import { calculateAverage } from "../src/scaleTypes";
 
 const server = new WebSocketServer({
   httpServer: createServer().listen(8000)
@@ -190,6 +192,32 @@ const addUserToSession = (sessionId, userId) => {
   sendSessionListUpdate();
 };
 
+const provideEstimate = payload => {
+  const { sessionId, storyId, estimateValue } = payload;
+
+  // Todo: convert userStories into an object of objects?
+  sessions.byId[sessionId].userStories.forEach((userStory, index) => {
+    if (userStory.id === storyId) {
+      sessions.byId[sessionId].userStories[index].estimatesGiven.push(
+        estimateValue
+      );
+
+      if (
+        sessions.byId[sessionId].userStories[index].estimatesGiven.length ===
+        sessions.byId[sessionId].participants.length
+      ) {
+        sessions.byId[sessionId].userStories[index].receivedAllEstimates = true;
+        sessions.byId[sessionId].userStories[index].average = calculateAverage(
+          sessions.byId[sessionId].scaleType,
+          sessions.byId[sessionId].userStories[index].estimatesGiven
+        );
+      }
+    }
+  });
+
+  sendSessionListUpdate();
+};
+
 const onMessage = (message, uuid) => {
   if (message.type === "utf8") {
     const parsedMessage = JSON.parse(message.utf8Data).message;
@@ -222,6 +250,9 @@ const onMessage = (message, uuid) => {
           parsedMessage.payload.sessionId,
           parsedMessage.payload.userId
         );
+        break;
+      case PROVIDE_ESTIMATE:
+        provideEstimate(parsedMessage.payload);
         break;
       default:
         break;

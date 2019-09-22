@@ -6,13 +6,50 @@ import {
   SESSION_STATUS_WAITING_FOR_PARTICIPANTS,
   SESSION_STATUS_INITIALIZING,
   SESSION_STATUS_PENDING_LAUNCH,
-  SESSION_STATUS_IN_PROGRESS
+  SESSION_STATUS_IN_PROGRESS,
+  SESSION_STATUS_FINISHED,
+  SESSION_STATUS_ABORTED
 } from "../constants";
-import { joinSession, updateSessionStatus } from "../redux/actions";
+import {
+  joinSession,
+  updateSessionStatus,
+  provideEstimate
+} from "../redux/actions";
 import { getCurrentUserUuid } from "../util/user";
 import { getUserNameById } from "../redux/selectors";
+import scaleTypes from "../scaleTypes";
 
 class Session extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sessionStarted: false,
+      currentStory: null,
+      remainingStories: [],
+      currentTimeLeft: 30,
+      estimatingOptions: [],
+      isFinished: false
+    };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const { session } = props;
+
+    if (!state.sessionStarted && session) {
+      return {
+        sessionStarted: true,
+        currentStory: session.userStories.shift(),
+        remainingStories: session.userStories,
+        currentTimeLeft: 30,
+        estimatingOptions: scaleTypes.find(
+          type => type.machineName === session.scaleType
+        ).options
+      };
+    }
+
+    return state;
+  }
+
   componentDidMount() {
     const {
       joinSession,
@@ -24,6 +61,43 @@ class Session extends Component {
     joinSession(sessionId, getCurrentUserUuid());
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const {
+      currentStory,
+      currentTimeLeft,
+      isFinished,
+      sessionStarted
+    } = this.state;
+    if (!this.currentUserIsModerator()) {
+      if (!prevState.sessionStarted) {
+        this.startTimer();
+      }
+
+      if (sessionStarted && !isFinished) {
+        if (!currentStory) {
+          this.finishForCurrentUser();
+        }
+
+        if (!currentTimeLeft) {
+          this.sendEstimate(currentStory.id, "TIME_EXPIRED");
+        }
+      } else if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = false;
+      }
+    }
+  }
+
+  startTimer = () => {
+    this.timer = setInterval(
+      () =>
+        this.setState(prevState => ({
+          currentTimeLeft: prevState.currentTimeLeft - 1
+        })),
+      1000
+    );
+  };
+
   startSession = () => {
     const {
       updateSessionStatus,
@@ -33,9 +107,95 @@ class Session extends Component {
     updateSessionStatus(id, SESSION_STATUS_IN_PROGRESS);
   };
 
+  finishSession = () => {
+    const {
+      updateSessionStatus,
+      session: { id }
+    } = this.props;
+
+    updateSessionStatus(id, SESSION_STATUS_FINISHED);
+  };
+
+  finishForCurrentUser = () => {
+    this.setState({ isFinished: true });
+  };
+
+  abortSession = () => {
+    const {
+      updateSessionStatus,
+      session: { id }
+    } = this.props;
+
+    updateSessionStatus(id, SESSION_STATUS_ABORTED);
+  };
+
+  goToNextStory = () => {
+    this.setState(prevState => ({
+      isFinished:
+        prevState.sessionStarted && !prevState.remainingStories.length,
+      currentStory: prevState.remainingStories.shift(),
+      remainingStories: prevState.remainingStories,
+      currentTimeLeft: 30
+    }));
+  };
+
+  sendEstimate = (storyId, estimateValue) => {
+    const {
+      provideEstimate,
+      session: { id: sessionId }
+    } = this.props;
+
+    provideEstimate(sessionId, storyId, estimateValue);
+    this.goToNextStory();
+  };
+
+  estimatingView = () => {
+    const { currentStory, currentTimeLeft, estimatingOptions } = this.state;
+
+    return (
+      <div>
+        <p>
+          <strong>Time left: </strong>
+          {currentTimeLeft}
+        </p>
+        <span>{currentStory.text}</span>
+        <ul>
+          {estimatingOptions.map(option => (
+            <li key={option.value}>
+              <button
+                type="submit"
+                onClick={() => this.sendEstimate(currentStory.id, option.value)}
+              >
+                {option.label}
+              </button>
+            </li>
+          ))}
+          <li>
+            <button
+              type="submit"
+              onClick={() =>
+                this.sendEstimate(currentStory.id, "NEEDS_MORE_INFO")
+              }
+            >
+              Needs info
+            </button>
+          </li>
+          <li>
+            <button
+              type="submit"
+              onClick={() => this.sendEstimate(currentStory.id, "UNDOABLE")}
+            >
+              Undoable
+            </button>
+          </li>
+        </ul>
+      </div>
+    );
+  };
+
   renderBasedOnStatus = () => {
     const {
-      session: { status, participants }
+      session: { status, participants, userStories }
     } = this.props;
 
     switch (status) {
@@ -63,7 +223,56 @@ class Session extends Component {
           <div>Waiting to start...</div>
         );
       case SESSION_STATUS_IN_PROGRESS:
-        return <div>Session in progress...</div>;
+        return this.currentUserIsModerator() ? (
+          <div>
+            <hr />
+            <h3>Participants are still estimating...</h3>
+            <p>
+              You can finish thre session with the current results or abort it.
+              Aborting will cause all of the estimations to be discarded.
+            </p>
+            <button type="submit">Finish</button>
+            <span>or</span>
+            <button type="submit">Abort</button>
+            <hr />
+            <div>
+              <ul>
+                {userStories.map(story => (
+                  <li key={story.id}>
+                    {story.text}
+                    {" | "}
+                    <strong>Estimates:</strong>
+                    {" | "}
+                    {story.estimatesGiven.map(estimate => (
+                      <span>
+                        {estimate}
+                        {" - "}
+                      </span>
+                    ))}
+                    {" | "}
+                    <span>
+                      {story.receivedAllEstimates
+                        ? "Received all estimates"
+                        : "Waiting for remaining estimates"}
+                    </span>
+                    {" | "}
+                    <span>
+                      {story.average
+                        ? story.average
+                        : "Will calculate when all estimates are given"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div>Session in progress...</div>
+            <hr />
+            {this.estimatingView()}
+          </div>
+        );
       default:
         return <div>Could not fetch status for this session.</div>;
     }
@@ -89,8 +298,9 @@ class Session extends Component {
     }
 
     const { name } = session;
+    const { isFinished } = this.state;
 
-    return (
+    return !isFinished ? (
       <div>
         <h1>{name}</h1>
         <span>
@@ -100,6 +310,8 @@ class Session extends Component {
         </span>
         {this.renderBasedOnStatus()}
       </div>
+    ) : (
+      <div>All done. Thanks.</div>
     );
   }
 }
@@ -120,6 +332,7 @@ const mapStateToProps = (state, ownProps) => {
 Session.propTypes = {
   joinSession: PropTypes.func.isRequired,
   updateSessionStatus: PropTypes.func.isRequired,
+  provideEstimate: PropTypes.func.isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
       id: PropTypes.string.isRequired
@@ -143,6 +356,6 @@ Session.defaultProps = {
 export default withRouter(
   connect(
     mapStateToProps,
-    { joinSession, updateSessionStatus }
+    { joinSession, updateSessionStatus, provideEstimate }
   )(Session)
 );

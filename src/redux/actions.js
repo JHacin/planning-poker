@@ -13,7 +13,8 @@ import {
   USER_DISCONNECT,
   GENERATE_NEXT_SESSION_ID,
   JOIN_SESSION,
-  UPDATE_SESSION_STATUS
+  UPDATE_SESSION_STATUS,
+  PROVIDE_ESTIMATE
 } from "./actionTypes";
 
 const sendToServer = message => ({
@@ -97,4 +98,10 @@ export const updateSessionStatus = (sessionId, status) =>
   sendToServer({
     type: UPDATE_SESSION_STATUS,
     payload: { sessionId, status }
+  });
+
+export const provideEstimate = (sessionId, storyId, estimateValue) =>
+  sendToServer({
+    type: PROVIDE_ESTIMATE,
+    payload: { sessionId, storyId, estimateValue }
   });
