@@ -27,7 +27,8 @@ import {
   USER_STATUS_DISCONNECTED,
   USER_STATUS_CONNECTED,
   SESSION_STATUS_WAITING_FOR_PARTICIPANTS,
-  SESSION_STATUS_PENDING_LAUNCH
+  SESSION_STATUS_PENDING_LAUNCH,
+  SESSION_STATUS_ABORTED
 } from "../src/constants";
 import { calculateAverage } from "../src/scaleTypes";
 
@@ -218,6 +219,27 @@ const provideEstimate = payload => {
   sendSessionListUpdate();
 };
 
+const updateSessionStatus = (sessionId, status) => {
+  sessions.byId[sessionId].status = status;
+  console.log(1);
+  switch (status) {
+    case SESSION_STATUS_ABORTED:
+      sessions.byId[sessionId].userStories = sessions.byId[
+        sessionId
+      ].userStories.map(userStory => ({
+        ...userStory,
+        estimatesGiven: [],
+        average: null,
+        receivedAllEstimates: false
+      }));
+      break;
+    default:
+      break;
+  }
+
+  sendSessionListUpdate();
+};
+
 const onMessage = (message, uuid) => {
   if (message.type === "utf8") {
     const parsedMessage = JSON.parse(message.utf8Data).message;
@@ -241,9 +263,10 @@ const onMessage = (message, uuid) => {
         removeSession(parsedMessage.payload.id);
         break;
       case UPDATE_SESSION_STATUS:
-        sessions.byId[parsedMessage.payload.sessionId].status =
-          parsedMessage.payload.status;
-        sendSessionListUpdate();
+        updateSessionStatus(
+          parsedMessage.payload.sessionId,
+          parsedMessage.payload.status
+        );
         break;
       case JOIN_SESSION:
         addUserToSession(

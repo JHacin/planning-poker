@@ -36,15 +36,33 @@ class Session extends Component {
     const { session } = props;
 
     if (!state.sessionStarted && session) {
+      const userStories = [...session.userStories];
+
       return {
         sessionStarted: true,
-        currentStory: session.userStories.shift(),
-        remainingStories: session.userStories,
+        currentStory: userStories.shift(),
+        remainingStories: userStories,
         currentTimeLeft: 30,
         estimatingOptions: scaleTypes.find(
           type => type.machineName === session.scaleType
         ).options
       };
+    }
+
+    if (state.sessionStarted) {
+      switch (session.status) {
+        case SESSION_STATUS_FINISHED:
+          return { isFinished: true };
+        case SESSION_STATUS_ABORTED:
+          return {
+            sessionStarted: false,
+            currentStory: null,
+            remainingStories: session.userStories,
+            currentTimeLeft: 30
+          };
+        default:
+          return state;
+      }
     }
 
     return state;
@@ -68,6 +86,7 @@ class Session extends Component {
       isFinished,
       sessionStarted
     } = this.state;
+
     if (!this.currentUserIsModerator()) {
       if (!prevState.sessionStarted) {
         this.startTimer();
@@ -152,7 +171,7 @@ class Session extends Component {
   estimatingView = () => {
     const { currentStory, currentTimeLeft, estimatingOptions } = this.state;
 
-    return (
+    return currentStory ? (
       <div>
         <p>
           <strong>Time left: </strong>
@@ -190,6 +209,8 @@ class Session extends Component {
           </li>
         </ul>
       </div>
+    ) : (
+      <div>No stories left.</div>
     );
   };
 
@@ -222,6 +243,32 @@ class Session extends Component {
         ) : (
           <div>Waiting to start...</div>
         );
+      case SESSION_STATUS_ABORTED:
+        return this.currentUserIsModerator() ? (
+          <div>
+            <div>You have aborted the session. Restart when ready.</div>
+            <ul>
+              {participants.map(participant => (
+                <li key={participant}>{participant}</li>
+              ))}
+            </ul>
+            <button type="submit" onClick={this.startSession}>
+              Go
+            </button>
+            <p>
+              You can wait for more participants or start. The session will
+              become unavailable to join during the process.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <div>
+              The moderator has aborted the session. Please wait for the session
+              to be rerun.
+            </div>
+            <div>Waiting to start...</div>
+          </div>
+        );
       case SESSION_STATUS_IN_PROGRESS:
         return this.currentUserIsModerator() ? (
           <div>
@@ -231,9 +278,13 @@ class Session extends Component {
               You can finish thre session with the current results or abort it.
               Aborting will cause all of the estimations to be discarded.
             </p>
-            <button type="submit">Finish</button>
+            <button type="submit" onClick={this.finishSession}>
+              Finish
+            </button>
             <span>or</span>
-            <button type="submit">Abort</button>
+            <button type="submit" onClick={this.abortSession}>
+              Abort
+            </button>
             <hr />
             <div>
               <ul>
@@ -244,7 +295,7 @@ class Session extends Component {
                     <strong>Estimates:</strong>
                     {" | "}
                     {story.estimatesGiven.map(estimate => (
-                      <span>
+                      <span key={estimate}>
                         {estimate}
                         {" - "}
                       </span>
@@ -273,6 +324,13 @@ class Session extends Component {
             {this.estimatingView()}
           </div>
         );
+
+      case SESSION_STATUS_FINISHED:
+        return this.currentUserIsModerator() ? (
+          <div>You have finished the session.</div>
+        ) : (
+          <div>The moderator has ended the session.</div>
+        );
       default:
         return <div>Could not fetch status for this session.</div>;
     }
@@ -298,9 +356,8 @@ class Session extends Component {
     }
 
     const { name } = session;
-    const { isFinished } = this.state;
 
-    return !isFinished ? (
+    return (
       <div>
         <h1>{name}</h1>
         <span>
@@ -310,8 +367,6 @@ class Session extends Component {
         </span>
         {this.renderBasedOnStatus()}
       </div>
-    ) : (
-      <div>All done. Thanks.</div>
     );
   }
 }
