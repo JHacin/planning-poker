@@ -6,7 +6,5 @@ import rootReducer from "./reducers";
 
 export default createStore(
   rootReducer,
-  composeWithDevTools(
-    applyMiddleware(thunkMiddleware, webSocketMiddleware)
-  )
+  composeWithDevTools(applyMiddleware(thunkMiddleware, webSocketMiddleware))
 );

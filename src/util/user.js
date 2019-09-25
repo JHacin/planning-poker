@@ -1,24 +1,24 @@
-import { LOCAL_STORAGE_USER_UUID, LOCAL_STORAGE_USER_NAME } from "../constants";
+import { LOCAL_STORAGE_USER_ID, LOCAL_STORAGE_USER_NAME } from "../constants";
 
-export const getCurrentUserUuid = () =>
-  localStorage.getItem(LOCAL_STORAGE_USER_UUID);
+export const getCurrentUserId = () => localStorage.getItem(LOCAL_STORAGE_USER_ID);
 
-export const setCurrentUserUuid = uuid => {
-  if (!getCurrentUserUuid()) {
-    localStorage.setItem(LOCAL_STORAGE_USER_UUID, uuid);
+export const isLoggedIn = () => getCurrentUserId() !== null;
+
+export const setCurrentUserId = id => {
+  if (!isLoggedIn()) {
+    localStorage.setItem(LOCAL_STORAGE_USER_ID, id);
   }
 };
 
-export const getCurrentUserName = () =>
-  localStorage.getItem(LOCAL_STORAGE_USER_NAME);
+export const getCurrentUserName = () => localStorage.getItem(LOCAL_STORAGE_USER_NAME);
 
 export const setCurrentUserName = username => {
-  if (!getCurrentUserName()) {
+  if (getCurrentUserName() === null) {
     localStorage.setItem(LOCAL_STORAGE_USER_NAME, username);
   }
 };
 
 export const removeCurrentUserSession = () => {
-  localStorage.removeItem(LOCAL_STORAGE_USER_UUID);
+  localStorage.removeItem(LOCAL_STORAGE_USER_ID);
   localStorage.removeItem(LOCAL_STORAGE_USER_NAME);
 };

@@ -1,15 +1,13 @@
 import { RECEIVE_FROM_SERVER, USER_LIST_UPDATE } from "../actionTypes";
-import { USER_STATUS_DISCONNECTED } from "../../constants";
 
 export const userListInitialState = {
-  uuidList: [],
-  byUuid: {}
+  idList: [],
+  byId: {}
 };
 
 export const userInitialState = {
-  uuid: "",
+  id: "",
   username: "",
-  connectionStatus: USER_STATUS_DISCONNECTED,
   moderatorOf: null,
   participantIn: null
 };

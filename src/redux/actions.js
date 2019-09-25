@@ -1,107 +1,70 @@
-import {
-  SEND_TO_SERVER,
-  RECEIVE_FROM_SERVER,
-  USER_LOGIN,
-  USER_LIST_UPDATE,
-  CURRENT_USER_LOG_IN,
-  CURRENT_USER_LOG_OUT,
-  USER_LOGOUT,
-  ADD_SESSION,
-  REMOVE_SESSION,
-  SESSION_LIST_UPDATE,
-  USER_RECONNECT,
-  USER_DISCONNECT,
-  GENERATE_NEXT_SESSION_ID,
-  JOIN_SESSION,
-  UPDATE_SESSION_STATUS,
-  PROVIDE_ESTIMATE
-} from "./actionTypes";
+import * as types from "./actionTypes";
 
 const sendToServer = message => ({
-  type: SEND_TO_SERVER,
+  type: types.SEND_TO_SERVER,
   message
 });
 
 const receiveFromServer = message => ({
-  type: RECEIVE_FROM_SERVER,
+  type: types.RECEIVE_FROM_SERVER,
   message
 });
 
-export const sendUserLogin = userData =>
+export const sendUserLogin = data =>
   sendToServer({
-    type: USER_LOGIN,
-    payload: { ...userData }
+    type: types.USER_LOGIN,
+    payload: { ...data }
   });
 
-export const sendUserLogout = uuid =>
+export const sendUserLogout = id =>
   sendToServer({
-    type: USER_LOGOUT,
-    payload: { uuid }
+    type: types.USER_LOGOUT,
+    payload: { id }
   });
 
-export const sendUserReconnect = userData =>
-  sendToServer({
-    type: USER_RECONNECT,
-    payload: { ...userData }
-  });
-
-export const receiveUserDisconnect = uuid =>
+export const receiveUserListUpdate = list =>
   receiveFromServer({
-    type: USER_DISCONNECT,
-    payload: { uuid }
+    type: types.USER_LIST_UPDATE,
+    payload: { ...list }
   });
-
-export const receiveUserListUpdate = userList =>
-  receiveFromServer({
-    type: USER_LIST_UPDATE,
-    payload: { ...userList }
-  });
-
-export const currentUserLogIn = () => ({
-  type: CURRENT_USER_LOG_IN
-});
-
-export const currentUserLogOut = () => ({
-  type: CURRENT_USER_LOG_OUT
-});
 
 export const sendGenerateNextSessionId = () =>
   sendToServer({
-    type: GENERATE_NEXT_SESSION_ID
+    type: types.GENERATE_NEXT_SESSION_ID
   });
 
-export const sendAddSession = sessionData =>
+export const sendAddSession = data =>
   sendToServer({
-    type: ADD_SESSION,
-    payload: { ...sessionData }
+    type: types.ADD_SESSION,
+    payload: { ...data }
   });
 
 export const sendRemoveSession = id =>
   sendToServer({
-    type: REMOVE_SESSION,
+    type: types.REMOVE_SESSION,
     payload: { id }
   });
 
-export const receiveSessionListUpdate = sessionList =>
+export const receiveSessionListUpdate = list =>
   receiveFromServer({
-    type: SESSION_LIST_UPDATE,
-    payload: { ...sessionList }
+    type: types.SESSION_LIST_UPDATE,
+    payload: { ...list }
   });
 
-export const joinSession = (sessionId, userId) =>
+export const joinSession = (session, user) =>
   sendToServer({
-    type: JOIN_SESSION,
-    payload: { sessionId, userId }
+    type: types.JOIN_SESSION,
+    payload: { session, user }
   });
 
-export const updateSessionStatus = (sessionId, status) =>
+export const updateSessionStatus = (id, status) =>
   sendToServer({
-    type: UPDATE_SESSION_STATUS,
-    payload: { sessionId, status }
+    type: types.UPDATE_SESSION_STATUS,
+    payload: { id, status }
   });
 
-export const provideEstimate = (sessionId, storyId, estimateValue) =>
+export const provideEstimate = (id, story, value) =>
   sendToServer({
-    type: PROVIDE_ESTIMATE,
-    payload: { sessionId, storyId, estimateValue }
+    type: types.PROVIDE_ESTIMATE,
+    payload: { id, story, value }
   });

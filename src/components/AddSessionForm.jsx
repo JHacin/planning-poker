@@ -5,15 +5,12 @@ import { withRouter, Redirect } from "react-router-dom";
 import { sendAddSession, sendGenerateNextSessionId } from "../redux/actions";
 import scaleTypes from "../scaleTypes";
 import { SCALE_FIBONACCI } from "../constants";
-import { getCurrentUserUuid } from "../util/user";
+import { getCurrentUserId } from "../util/user";
 import { userStoryInitialState } from "../redux/reducers/sessions";
 
 const ScaleTypeOptionList = ({ onChange }) => {
   return (
-    <select
-      onChange={e => onChange(e.target.value)}
-      defaultValue={SCALE_FIBONACCI}
-    >
+    <select onChange={e => onChange(e.target.value)} defaultValue={SCALE_FIBONACCI}>
       {scaleTypes.map(type => (
         <option key={type.machineName} value={type.machineName}>
           {type.title}
@@ -57,7 +54,7 @@ class AddSessionForm extends Component {
     sendAddSession({
       ...restOfState,
       id: nextSessionId,
-      moderator: getCurrentUserUuid()
+      moderator: getCurrentUserId()
     });
 
     this.setState({ submitted: true });
@@ -113,16 +110,10 @@ class AddSessionForm extends Component {
               required
               autoFocus
               key={story.id}
-              onChange={e =>
-                this.onUserStoryInputChange(story.id, e.target.value)
-              }
+              onChange={e => this.onUserStoryInputChange(story.id, e.target.value)}
             />
           ))}
-          <input
-            type="submit"
-            value="Start"
-            hidden={!userStories.length ? "hidden" : ""}
-          />
+          <input type="submit" value="Start" hidden={!userStories.length ? "hidden" : ""} />
         </form>
       </div>
     );

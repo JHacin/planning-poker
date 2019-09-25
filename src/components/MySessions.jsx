@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { getSessionsCreatedByUser } from "../redux/selectors";
-import { getCurrentUserUuid } from "../util/user";
+import { getCurrentUserId } from "../util/user";
 import { getTitle } from "../scaleTypes";
 
 const NoSessionsDisplay = () => {
@@ -58,11 +58,7 @@ const MySessions = ({ mySessions }) => {
   return (
     <div>
       <h2>My Sessions</h2>
-      {mySessions.length ? (
-        <SessionList mySessions={mySessions} />
-      ) : (
-        <NoSessionsDisplay />
-      )}
+      {mySessions.length ? <SessionList mySessions={mySessions} /> : <NoSessionsDisplay />}
     </div>
   );
 };
@@ -70,7 +66,7 @@ const MySessions = ({ mySessions }) => {
 MySessions.propTypes = { ...SessionList.propTypes };
 
 const mapStateToProps = state => ({
-  mySessions: getSessionsCreatedByUser(state, getCurrentUserUuid())
+  mySessions: getSessionsCreatedByUser(state, getCurrentUserId())
 });
 
 export default withRouter(

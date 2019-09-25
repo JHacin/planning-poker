@@ -1,8 +1,7 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { NavLink, withRouter } from "react-router-dom";
-import { connect } from "react-redux";
 import styled from "styled-components";
+import { isLoggedIn } from "../util/user";
 
 const StyledHeader = styled.header`
   display: flex;
@@ -27,9 +26,9 @@ const StyledHorizontalRule = styled.hr`
   width: 100%;
 `;
 
-const Header = ({ currentUser }) => {
+const Header = () => {
   return (
-    currentUser.isLoggedIn && (
+    isLoggedIn() && (
       <StyledHeader>
         <div>
           <NavLink to="/" activeClassName="active" exact>
@@ -53,19 +52,4 @@ const Header = ({ currentUser }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  currentUser: state.currentUser
-});
-
-Header.propTypes = {
-  currentUser: PropTypes.shape({
-    isLoggedIn: PropTypes.bool.isRequired
-  }).isRequired
-};
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    null
-  )(Header)
-);
+export default withRouter(Header);

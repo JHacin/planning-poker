@@ -5,7 +5,7 @@ const User = ({ user }) => <li>{user.username}</li>;
 
 User.propTypes = {
   user: PropTypes.shape({
-    uuid: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired
   }).isRequired
 };

@@ -60,11 +60,12 @@ export const calculateAverage = (scaleType, estimates) => {
 
   const closest = scaleTypes
     .find(type => type.machineName === scaleType)
-    .options.sort(
-      (a, b) => Math.abs(average - a.value) - Math.abs(average - b.value)
-    )[0];
+    .options.sort((a, b) => Math.abs(average - a.value) - Math.abs(average - b.value))[0];
 
   return closest.label;
 };
+
+export const getOptionsForType = type =>
+  scaleTypes.find(scaleType => scaleType.machineName === type).options;
 
 export default scaleTypes;

@@ -6,10 +6,8 @@ import User from "./User";
 const UserList = ({ users }) => (
   <ul>
     {users && <strong>User list:</strong>}
-    {users && users.uuidList.length
-      ? users.uuidList.map(uuid => (
-          <User key={uuid} user={users.byUuid[uuid]} />
-        ))
+    {users && users.idList.length
+      ? users.idList.map(id => <User key={id} user={users.byId[id]} />)
       : "No users found."}
   </ul>
 );
@@ -20,10 +18,10 @@ const mapStateToProps = state => ({
 
 UserList.propTypes = {
   users: PropTypes.shape({
-    uuidList: PropTypes.arrayOf(PropTypes.string).isRequired,
-    byUuid: PropTypes.objectOf(
+    idList: PropTypes.arrayOf(PropTypes.string).isRequired,
+    byId: PropTypes.objectOf(
       PropTypes.shape({
-        uuid: PropTypes.string.isRequired,
+        id: PropTypes.string.isRequired,
         username: PropTypes.string.isRequired
       })
     ).isRequired

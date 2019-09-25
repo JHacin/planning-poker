@@ -8,7 +8,7 @@ import MySessions from "./components/MySessions";
 import PrivateRoute from "./components/PrivateRoute";
 import LogoutRoute from "./components/LogoutRoute";
 import AddSessionForm from "./components/AddSessionForm";
-import Session from "./components/Session";
+import Session from "./components/Session/Session";
 
 const App = () => {
   return (

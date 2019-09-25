@@ -1,5 +1,5 @@
 import { RECEIVE_FROM_SERVER, SESSION_LIST_UPDATE } from "../actionTypes";
-import { SCALE_FIBONACCI, SESSION_STATUS_INITIALIZING } from "../../constants";
+import { SCALE_FIBONACCI, SESSION_INITIALIZING } from "../../constants";
 
 export const sessionListInitialState = {
   idList: [],
@@ -10,7 +10,7 @@ export const sessionListInitialState = {
 export const sessionInitialState = {
   id: 0,
   name: "",
-  status: SESSION_STATUS_INITIALIZING,
+  status: SESSION_INITIALIZING,
   moderator: "",
   userStories: [],
   participants: [],

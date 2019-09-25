@@ -17,17 +17,12 @@ export const getSessionsCreatedByUser = (state, userId) => {
 };
 
 export const getUserNameById = (state, userId) => {
-  return state.users.uuidList.includes(userId)
-    ? state.users.byUuid[userId].username
-    : "";
+  return state.users.idList.includes(userId) ? state.users.byId[userId].username : "";
 };
 
 export const getSessionModerator = (state, sessionId) => {
   return sessionsExist(state) &&
-    Object.prototype.hasOwnProperty.call(
-      getSessionById(state, sessionId),
-      "moderator"
-    )
+    Object.prototype.hasOwnProperty.call(getSessionById(state, sessionId), "moderator")
     ? getSessionById(state, sessionId).moderator
     : false;
 };
@@ -36,10 +31,7 @@ export const getSessionsWithFullData = state => {
   if (sessionsExist(state)) {
     const sessions = { ...state.sessions };
     state.sessions.idList.forEach(id => {
-      sessions.byId[id].moderatorName = getUserNameById(
-        state,
-        getSessionModerator(state, id)
-      );
+      sessions.byId[id].moderatorName = getUserNameById(state, getSessionModerator(state, id));
     });
     return sessions;
   }

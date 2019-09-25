@@ -21,6 +21,12 @@
   },
   "plugins": ["react"],
   "rules": {
+    "max-len": [
+      "error",
+      {
+        "code": 100
+      }
+    ],
     "quotes": ["error", "double"],
     "react/jsx-indent": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
@@ -30,7 +36,6 @@
       {
         "allow": [
           "sendUserLogin",
-          "currentUserLogIn",
           "sendUserLogout",
           "sendAddSession",
           "sendGenerateNextSessionId",
