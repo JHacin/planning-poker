@@ -21,6 +21,7 @@ export const userStoryInitialState = {
   id: 0,
   text: "",
   estimatesGiven: [],
+  previousEstimates: [],
   average: null,
   receivedAllEstimates: false
 };

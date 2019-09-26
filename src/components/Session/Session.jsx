@@ -10,7 +10,10 @@ import {
   SESSION_FINISHED,
   SESSION_ABORTED,
   ESTIMATE_TIME_LIMIT,
-  ESTIMATE_TIMER_EXPIRED
+  ESTIMATE_NOT_GIVEN,
+  SESSION_COMPLETED,
+  SESSION_RUN_AGAIN,
+  SESSION_RUN_AGAIN_FRESH
 } from "../../constants";
 import { joinSession, updateSessionStatus, provideEstimate } from "../../redux/actions";
 import { getCurrentUserId } from "../../util/user";
@@ -28,6 +31,7 @@ import SessionError from "./Views/SessionError";
 import SessionInitializing from "./Views/SessionInitializing";
 import SessionWaitingForParticipants from "./Views/SessionWaitingForParticipants";
 import UserGaveAllEstimates from "./Views/UserGaveAllEstimates";
+import CompletedForModerator from "./Views/CompletedForModerator";
 
 class Session extends Component {
   constructor(props) {
@@ -94,7 +98,7 @@ class Session extends Component {
     if (!this.currentUserIsModerator()) {
       // Session has just begun.
       if (!prevState.sessionStarted) {
-        // this.startTimer();
+        this.startTimer();
       }
 
       // Session is in progress.
@@ -106,7 +110,7 @@ class Session extends Component {
 
         // User's time on the current story has run out.
         if (!currentTimeLeft) {
-          this.sendEstimate(currentStory.id, ESTIMATE_TIMER_EXPIRED);
+          this.sendEstimate(currentStory.id, ESTIMATE_NOT_GIVEN);
         }
       } else {
         this.clearTimer();
@@ -160,6 +164,32 @@ class Session extends Component {
     } = this.props;
 
     updateSessionStatus(id, SESSION_ABORTED);
+  };
+
+  runSessionAgain = () => {
+    const {
+      updateSessionStatus,
+      session: { id }
+    } = this.props;
+
+    updateSessionStatus(id, SESSION_RUN_AGAIN);
+  };
+
+  runSessionAgainFresh = () => {
+    const {
+      updateSessionStatus,
+      session: { id }
+    } = this.props;
+
+    updateSessionStatus(id, SESSION_RUN_AGAIN_FRESH);
+  };
+
+  addUserStory = () => {
+    // const {
+    //   updateSessionStatus,
+    //   session: { id }
+    // } = this.props;
+    // updateSessionStatus(id, SESSION_RUN_AGAIN_FRESH);
   };
 
   noStoriesLeftForCurrentUser = state => state.sessionStarted && !state.remainingStories.length;
@@ -236,6 +266,17 @@ class Session extends Component {
         );
       case SESSION_FINISHED:
         return currentUserIsModerator ? <FinishedForModerator /> : <FinishedForUser />;
+      case SESSION_COMPLETED:
+        return currentUserIsModerator ? (
+          <CompletedForModerator
+            runSessionAgain={this.runSessionAgain}
+            runSessionAgainFresh={this.runSessionAgainFresh}
+            addUserStory={this.addUserStory}
+            userStories={userStories}
+          />
+        ) : (
+          <UserGaveAllEstimates />
+        );
       default:
         return <SessionError />;
     }
@@ -248,11 +289,12 @@ class Session extends Component {
       return <SessionInitializing />;
     }
 
-    const { name } = session;
+    const { name, status } = session;
 
     return (
       <div>
         <h1>{name}</h1>
+        <h4>{status}</h4>
         {this.renderBasedOnStatus()}
       </div>
     );

@@ -7,7 +7,16 @@ import { sessionListInitialState, sessionInitialState } from "../src/redux/reduc
 import {
   SESSION_WAITING_FOR_PARTICIPANTS,
   SESSION_PENDING_LAUNCH,
-  SESSION_ABORTED
+  SESSION_ABORTED,
+  SESSION_COMPLETED,
+  ESTIMATE_NOT_GIVEN,
+  SESSION_COMPLETED_WITH_MISSING_ESTIMATES,
+  ESTIMATE_IS_UNDOABLE,
+  SESSION_COMPLETED_WITH_UNDOABLE,
+  ESTIMATE_NEEDS_MORE_INFO,
+  SESSION_COMPLETED_NEED_MORE_INFO,
+  SESSION_RUN_AGAIN,
+  SESSION_RUN_AGAIN_FRESH
 } from "../src/constants";
 import { calculateAverage } from "../src/scaleTypes";
 
@@ -133,9 +142,11 @@ const handleDisconnected = id => {
 };
 
 const addSession = payload => {
-  if (!sessionExists(payload.id)) {
-    sessions.idList.push(payload.id);
-    sessions.byId[payload.id] = {
+  const { id } = payload;
+
+  if (!sessionExists(id)) {
+    sessions.idList.push(id);
+    sessions.byId[id] = {
       ...sessionInitialState,
       ...payload,
       status: SESSION_WAITING_FOR_PARTICIPANTS
@@ -164,6 +175,41 @@ const addUserToSession = payload => {
   sendSessionListUpdate();
 };
 
+const userStoriesContainIrregularValue = (session, value) => {
+  return session.userStories.some(story => story.average === value);
+};
+
+const setStatusBeforeFinishing = session => {
+  const { id } = session;
+  let status = SESSION_COMPLETED;
+
+  if (userStoriesContainIrregularValue(session, ESTIMATE_NOT_GIVEN)) {
+    status = SESSION_COMPLETED_WITH_MISSING_ESTIMATES;
+  } else if (userStoriesContainIrregularValue(session, ESTIMATE_IS_UNDOABLE)) {
+    status = SESSION_COMPLETED_WITH_UNDOABLE;
+  } else if (userStoriesContainIrregularValue(session, ESTIMATE_NEEDS_MORE_INFO)) {
+    status = SESSION_COMPLETED_NEED_MORE_INFO;
+  }
+
+  setSessionProperty(id, "status", status);
+};
+
+const checkIfAllEstimatesReceived = session => {
+  const { userStories } = session;
+  const numStories = userStories.length;
+  let numFinished = 0;
+
+  userStories.forEach(userStory => {
+    if (userStory.receivedAllEstimates) {
+      numFinished += 1;
+    }
+  });
+
+  if (numFinished === numStories) {
+    setStatusBeforeFinishing(session);
+  }
+};
+
 const provideEstimate = payload => {
   const { id, story, value } = payload;
   const session = getSession(id);
@@ -176,6 +222,7 @@ const provideEstimate = payload => {
       if (estimates.length === participants.length) {
         userStories[index].receivedAllEstimates = true;
         userStories[index].average = calculateAverage(scaleType, estimates);
+        checkIfAllEstimatesReceived(session);
       }
     }
   });
@@ -183,15 +230,28 @@ const provideEstimate = payload => {
   sendSessionListUpdate();
 };
 
-const resetSessionStories = id => {
+const resetSessionStories = (id, logPreviousEstimates = false) => {
   const stories = getSession(id).userStories.map(story => ({
     ...story,
+    previousEstimates: logPreviousEstimates
+      ? [...story.previousEstimates, ...story.estimatesGiven]
+      : [],
     estimatesGiven: [],
     average: null,
     receivedAllEstimates: false
   }));
 
   setSessionProperty(id, "userStories", stories);
+};
+
+const removeAllParticipantsFromSession = id => {
+  setSessionProperty(id, "participants", []);
+  setSessionProperty(id, "status", SESSION_WAITING_FOR_PARTICIPANTS);
+};
+
+const runSessionAgain = (id, runFresh = false) => {
+  removeAllParticipantsFromSession(id);
+  resetSessionStories(id, !runFresh);
 };
 
 const updateSessionStatus = payload => {
@@ -201,6 +261,12 @@ const updateSessionStatus = payload => {
   switch (status) {
     case SESSION_ABORTED:
       resetSessionStories(id);
+      break;
+    case SESSION_RUN_AGAIN:
+      runSessionAgain(id);
+      break;
+    case SESSION_RUN_AGAIN_FRESH:
+      runSessionAgain(id, true);
       break;
     default:
       break;
