@@ -4,6 +4,26 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+  color: #000;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Roboto Mono", sans-serif;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
 }
 
 ul,
@@ -14,4 +34,16 @@ ol {
 a {
   text-decoration: underline;
   color: blue;
+}
+
+input:focus {
+  outline: none;
+}
+
+input::placeholder {
+  color: #000;
+}
+
+input[type="submit"]:hover {
+  cursor: pointer;
 }

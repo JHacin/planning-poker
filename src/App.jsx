@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import LoginForm from "./components/LoginForm";
+import LoginPage from "./components/LoginPage";
 import Header from "./components/Header";
 import JoinSessions from "./components/JoinSessions";
 import MySessions from "./components/MySessions";
@@ -14,7 +14,7 @@ const App = () => {
   return (
     <Router>
       <Header />
-      <Route path="/login" component={LoginForm} />
+      <Route path="/login" component={LoginPage} />
       <PrivateRoute path="/" exact component={LandingPage} />
       <PrivateRoute path="/join-sessions" exact component={JoinSessions} />
       <PrivateRoute path="/my-sessions" exact component={MySessions} />

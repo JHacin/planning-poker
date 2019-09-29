@@ -18,6 +18,11 @@ export const setCurrentUserName = username => {
   }
 };
 
+export const addCurrentUserSession = (id, username) => {
+  setCurrentUserId(id);
+  setCurrentUserName(username);
+}
+
 export const removeCurrentUserSession = () => {
   localStorage.removeItem(LOCAL_STORAGE_USER_ID);
   localStorage.removeItem(LOCAL_STORAGE_USER_NAME);

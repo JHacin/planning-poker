@@ -3,8 +3,13 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Redirect, withRouter } from "react-router-dom";
 import generateUniqueId from "uuid/v1";
-import { sendUserLogin } from "../redux/actions";
-import { setCurrentUserName, setCurrentUserId, getCurrentUserId, isLoggedIn } from "../util/user";
+import { sendUserLogin } from "../../redux/actions";
+import {
+  getCurrentUserId,
+  isLoggedIn,
+  addCurrentUserSession
+} from "../../util/user";
+import LoginPage from "./LoginPage";
 
 class LoginForm extends Component {
   constructor(props) {
@@ -23,8 +28,7 @@ class LoginForm extends Component {
     const { username } = this.state;
     const { sendUserLogin } = this.props;
 
-    setCurrentUserId(generateUniqueId());
-    setCurrentUserName(username);
+    addCurrentUserSession(generateUniqueId(), username);
     sendUserLogin({ id: getCurrentUserId(), username });
 
     this.setState({ username: "" });
@@ -32,13 +36,7 @@ class LoginForm extends Component {
 
   render() {
     return !isLoggedIn() ? (
-      <div>
-        <h1>Planning Poker</h1>
-        <form onSubmit={e => this.handleSubmit(e)}>
-          <input required onChange={e => this.handleInputChange(e.target.value)} />
-          <input type="submit" value="Login" />
-        </form>
-      </div>
+      <LoginPage handleSubmit={this.handleSubmit} handleInputChange={this.handleInputChange} />
     ) : (
       <Redirect to="/my-sessions" />
     );
