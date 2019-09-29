@@ -17,10 +17,9 @@ const NoSessionsDisplay = () => {
 const SessionList = ({ sessions }) => {
   const { idList, byId } = sessions;
 
-  const ListItems = () =>
-    idList.map(id => {
+  const ListItems = () => {
+    return idList.map(id => {
       const { name, scaleType, moderatorName, id: sessionId } = byId[id];
-
       return (
         <li key={sessionId}>
           <p>
@@ -40,27 +39,13 @@ const SessionList = ({ sessions }) => {
         </li>
       );
     });
+  };
 
   return (
     <ul>
       <ListItems />
     </ul>
   );
-};
-
-SessionList.propTypes = {
-  sessions: PropTypes.shape({
-    idList: PropTypes.arrayOf(PropTypes.number).isRequired,
-    byId: PropTypes.objectOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        moderator: PropTypes.string.isRequired,
-        scaleType: PropTypes.string.isRequired,
-        moderatorName: PropTypes.string.isRequired
-      })
-    ).isRequired
-  }).isRequired
 };
 
 const JoinSessions = ({ sessions }) => {
@@ -77,6 +62,21 @@ const JoinSessions = ({ sessions }) => {
 const mapStateToProps = state => ({
   sessions: getSessionsWithFullData(state)
 });
+
+SessionList.propTypes = {
+  sessions: PropTypes.shape({
+    idList: PropTypes.arrayOf(PropTypes.number).isRequired,
+    byId: PropTypes.objectOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        moderator: PropTypes.string.isRequired,
+        scaleType: PropTypes.string.isRequired,
+        moderatorName: PropTypes.string.isRequired
+      })
+    ).isRequired
+  }).isRequired
+};
 
 JoinSessions.propTypes = { ...SessionList.propTypes };
 

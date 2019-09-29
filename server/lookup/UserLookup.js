@@ -6,7 +6,8 @@ const UserLookup = {
   },
 
   getActiveSession: id => {
-    return UserStorage.getById(id).participantIn;
+    const user = UserStorage.getById(id);
+    return user && user.participantIn;
   }
 };
 

@@ -1,12 +1,6 @@
 import SessionStorage from "../storage/SessionStorage";
-import {
-  ESTIMATE_NOT_GIVEN,
-  SESSION_COMPLETED_WITH_MISSING_ESTIMATES,
-  ESTIMATE_IS_UNDOABLE,
-  SESSION_COMPLETED_WITH_UNDOABLE,
-  ESTIMATE_NEEDS_MORE_INFO,
-  SESSION_COMPLETED_NEED_MORE_INFO
-} from "../../src/constants";
+import { SESSION_COMPLETED } from "../../src/constants";
+import evaluateEstimates from "../../src/util/session";
 
 const SessionLookup = {
   exists: id => {
@@ -22,7 +16,7 @@ const SessionLookup = {
   },
 
   getByModerator: moderator => {
-    return SessionStorage.getList().filter(
+    return SessionStorage.getList().find(
       session => SessionStorage.getById(session).moderator === moderator
     );
   },
@@ -52,18 +46,8 @@ const SessionLookup = {
   getStatusOnCompletion: id => {
     const session = SessionStorage.getById(id);
     const averages = session.userStories.map(story => story.average);
-
-    if (averages.includes(ESTIMATE_NOT_GIVEN)) {
-      return SESSION_COMPLETED_WITH_MISSING_ESTIMATES;
-    }
-
-    if (averages.includes(ESTIMATE_IS_UNDOABLE)) {
-      return SESSION_COMPLETED_WITH_UNDOABLE;
-    }
-
-    if (averages.includes(ESTIMATE_NEEDS_MORE_INFO)) {
-      return SESSION_COMPLETED_NEED_MORE_INFO;
-    }
+    const unsatisfactoryStatus = evaluateEstimates(averages);
+    return unsatisfactoryStatus || SESSION_COMPLETED;
   }
 };
 

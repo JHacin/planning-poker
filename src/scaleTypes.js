@@ -1,11 +1,5 @@
-import {
-  SCALE_FIBONACCI,
-  SCALE_T_SHIRT,
-  SCALE_GAMER,
-  ESTIMATE_NOT_GIVEN,
-  ESTIMATE_IS_UNDOABLE,
-  ESTIMATE_NEEDS_MORE_INFO
-} from "./constants";
+import { SCALE_FIBONACCI, SCALE_T_SHIRT, SCALE_GAMER } from "./constants";
+import evaluateEstimates from "./util/session";
 
 const scaleTypes = [
   {
@@ -62,16 +56,10 @@ export const getTitle = machineName => {
 };
 
 export const calculateAverage = (scaleType, estimates) => {
-  if (estimates.some(estimate => estimate === ESTIMATE_NOT_GIVEN)) {
-    return ESTIMATE_NOT_GIVEN;
-  }
+  const unsatisfactoryEstimate = evaluateEstimates(estimates, true);
 
-  if (estimates.some(estimate => estimate === ESTIMATE_IS_UNDOABLE)) {
-    return ESTIMATE_IS_UNDOABLE;
-  }
-
-  if (estimates.some(estimate => estimate === ESTIMATE_NEEDS_MORE_INFO)) {
-    return ESTIMATE_NEEDS_MORE_INFO;
+  if (unsatisfactoryEstimate) {
+    return unsatisfactoryEstimate;
   }
 
   const total = estimates.reduce((a, b) => a + b, 0);

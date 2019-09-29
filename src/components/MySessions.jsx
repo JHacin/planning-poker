@@ -16,10 +16,9 @@ const NoSessionsDisplay = () => {
 };
 
 const SessionList = ({ mySessions }) => {
-  const ListItems = () =>
-    mySessions.map(session => {
+  const ListItems = () => {
+    return mySessions.map(session => {
       const { id, name, scaleType } = session;
-
       return (
         <div key={id}>
           <a href={`sessions/${id}`}>{name}</a>
@@ -30,10 +29,20 @@ const SessionList = ({ mySessions }) => {
         </div>
       );
     });
+  };
 
   return (
     <div>
       <ListItems />
+    </div>
+  );
+};
+
+const MySessions = ({ mySessions }) => {
+  return (
+    <div>
+      <h2>My Sessions</h2>
+      {mySessions.length ? <SessionList mySessions={mySessions} /> : <NoSessionsDisplay />}
     </div>
   );
 };
@@ -52,15 +61,6 @@ SessionList.propTypes = {
       )
     })
   ).isRequired
-};
-
-const MySessions = ({ mySessions }) => {
-  return (
-    <div>
-      <h2>My Sessions</h2>
-      {mySessions.length ? <SessionList mySessions={mySessions} /> : <NoSessionsDisplay />}
-    </div>
-  );
 };
 
 MySessions.propTypes = { ...SessionList.propTypes };

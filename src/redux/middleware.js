@@ -1,5 +1,5 @@
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import { SEND_TO_SERVER, USER_LOGIN, USER_LOGOUT } from "./actionTypes";
+import { SEND_TO_SERVER, USER_LOGOUT } from "./actionTypes";
 import { sendUserLogin } from "./actions";
 import { getCurrentUserId, getCurrentUserName, removeCurrentUserSession } from "../util/user";
 
@@ -53,18 +53,11 @@ const webSocketMiddleware = store => {
 
   return next => action => {
     if (action.type === SEND_TO_SERVER) {
-      switch (action.message.type) {
-        case USER_LOGIN:
-          sendToWebsocket(action);
-          break;
-        case USER_LOGOUT:
-          sendToWebsocket(action);
-          removeCurrentUserSession();
-          closeSocket();
-          break;
-        default:
-          sendToWebsocket(action);
-          break;
+      sendToWebsocket(action);
+
+      if (action.message.type === USER_LOGOUT) {
+        removeCurrentUserSession();
+        closeSocket();
       }
     }
 

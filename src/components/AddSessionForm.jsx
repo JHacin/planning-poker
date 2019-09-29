@@ -20,21 +20,15 @@ const ScaleTypeOptionList = ({ onChange }) => {
   );
 };
 
-ScaleTypeOptionList.propTypes = {
-  onChange: PropTypes.func.isRequired
-};
-
-const formInitialState = {
-  name: "",
-  scaleType: SCALE_FIBONACCI,
-  userStories: [],
-  submitted: false
-};
-
 class AddSessionForm extends Component {
   constructor(props) {
     super(props);
-    this.state = { ...formInitialState };
+    this.state = {
+      name: "",
+      scaleType: SCALE_FIBONACCI,
+      userStories: [],
+      submitted: false
+    };
   }
 
   componentDidMount() {
@@ -120,15 +114,19 @@ class AddSessionForm extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  nextSessionId: state.sessions.nextSessionId
-});
+ScaleTypeOptionList.propTypes = {
+  onChange: PropTypes.func.isRequired
+};
 
 AddSessionForm.propTypes = {
   nextSessionId: PropTypes.number.isRequired,
   sendAddSession: PropTypes.func.isRequired,
   sendGenerateNextSessionId: PropTypes.func.isRequired
 };
+
+const mapStateToProps = state => ({
+  nextSessionId: state.sessions.nextSessionId
+});
 
 export default withRouter(
   connect(

@@ -6,7 +6,6 @@ import { SESSION_ABORTED, SESSION_RUN_AGAIN, SESSION_RUN_AGAIN_FRESH } from "../
 import UserOps from "./operations/UserOps";
 import SessionOps from "./operations/SessionOps";
 import ArrayUtil from "./util/array";
-import UserLookup from "./lookup/UserLookup";
 import SessionStorage from "./storage/SessionStorage";
 import UserStorage from "./storage/UserStorage";
 
@@ -33,6 +32,25 @@ const sendUsersUpdate = () => {
 
 const sendSessionsUpdate = (targetUser = false) => {
   sendResponse(echoSessionList({ ...SessionStorage.getAll() }), targetUser);
+};
+
+const flagAsDisconnected = id => {
+  if (!disconnectedUsers.includes(id)) {
+    disconnectedUsers.push(id);
+  }
+};
+
+const unflagAsDisconnected = id => {
+  disconnectedUsers = ArrayUtil.remove(disconnectedUsers, id);
+};
+
+const removeIfNotReconnected = id => {
+  if (disconnectedUsers.includes(id)) {
+    UserOps.remove(id);
+    unflagAsDisconnected(id);
+    sendUsersUpdate();
+    sendSessionsUpdate();
+  }
 };
 
 const updateSessionStatus = payload => {
@@ -69,6 +87,7 @@ const onMessage = (message, id) => {
         break;
       case actionTypes.USER_LOGOUT:
         UserOps.remove(payload.id);
+        unflagAsDisconnected(payload.id);
         sendUsersUpdate();
         sendSessionsUpdate();
         break;
@@ -110,34 +129,18 @@ const onMessage = (message, id) => {
   }
 };
 
-const flagAsDisconnected = id => {
-  if (!disconnectedUsers.includes(id)) {
-    disconnectedUsers.push(id);
-  }
-};
-
-const removeIfNotReconnected = id => {
-  if (disconnectedUsers.includes(id)) {
-    SessionOps.removeParticipant(UserLookup.getActiveSession(id), id);
-    sendUsersUpdate();
-    sendSessionsUpdate();
-  }
-};
-
-const onClose = id => {
-  flagAsDisconnected(id);
-  setTimeout(() => removeIfNotReconnected(id), 5000);
-};
-
 server.on("request", request => {
   const client = request.resourceURL.query.id;
   const connection = request.accept(null, request.origin);
   clients[client] = connection;
 
   if (disconnectedUsers.includes(client)) {
-    disconnectedUsers = ArrayUtil.remove(disconnectedUsers, client);
+    unflagAsDisconnected(client);
   }
 
   connection.on("message", message => onMessage(message, client));
-  connection.on("close", () => onClose(client));
+  connection.on("close", () => {
+    flagAsDisconnected(client);
+    setTimeout(() => removeIfNotReconnected(client), 5000);
+  });
 });

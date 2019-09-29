@@ -17,8 +17,10 @@ const UserStorage = {
   },
 
   remove: id => {
-    delete users.byId[id];
-    users.idList = ArrayUtil.remove(users.idList, id);
+    if (users.idList.includes(id)) {
+      delete users.byId[id];
+      users.idList = ArrayUtil.remove(users.idList, id);
+    }
   },
 
   setValue: (id, prop, value) => {
