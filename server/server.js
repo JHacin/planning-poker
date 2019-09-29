@@ -1,278 +1,59 @@
 import { createServer } from "http";
 import { server as WebSocketServer } from "websocket";
 import * as actionTypes from "../src/redux/actionTypes";
-import { receiveUserListUpdate, receiveSessionListUpdate } from "../src/redux/actions";
-import { userListInitialState, userInitialState } from "../src/redux/reducers/users";
-import { sessionListInitialState, sessionInitialState } from "../src/redux/reducers/sessions";
-import {
-  SESSION_WAITING_FOR_PARTICIPANTS,
-  SESSION_PENDING_LAUNCH,
-  SESSION_ABORTED,
-  SESSION_COMPLETED,
-  ESTIMATE_NOT_GIVEN,
-  SESSION_COMPLETED_WITH_MISSING_ESTIMATES,
-  ESTIMATE_IS_UNDOABLE,
-  SESSION_COMPLETED_WITH_UNDOABLE,
-  ESTIMATE_NEEDS_MORE_INFO,
-  SESSION_COMPLETED_NEED_MORE_INFO,
-  SESSION_RUN_AGAIN,
-  SESSION_RUN_AGAIN_FRESH
-} from "../src/constants";
-import { calculateAverage } from "../src/scaleTypes";
+import { echoUserList, echoSessionList } from "../src/redux/actions";
+import { SESSION_ABORTED, SESSION_RUN_AGAIN, SESSION_RUN_AGAIN_FRESH } from "../src/constants";
+import UserOps from "./operations/UserOps";
+import SessionOps from "./operations/SessionOps";
+import ArrayUtil from "./util/array";
+import UserLookup from "./lookup/UserLookup";
+import SessionStorage from "./storage/SessionStorage";
+import UserStorage from "./storage/UserStorage";
 
 const server = new WebSocketServer({
   httpServer: createServer().listen(8000)
 });
 
 const clients = {};
-const users = { ...userListInitialState };
-const sessions = { ...sessionListInitialState };
-
-const sendMessageToClient = (client, message) => {
-  clients[client].sendUTF(message);
-};
+let disconnectedUsers = [];
 
 const sendResponse = (response, targetUser = false) => {
   const message = JSON.stringify(response);
 
   if (targetUser) {
-    sendMessageToClient(targetUser, message);
+    clients[targetUser].sendUTF(message);
   } else {
-    Object.keys(clients).forEach(client => sendMessageToClient(client, message));
+    Object.keys(clients).forEach(client => clients[client].sendUTF(message));
   }
 };
 
-const generateNextSessionId = targetUser => {
-  sessions.nextSessionId += 1;
-  sendResponse(receiveSessionListUpdate(sessions), targetUser);
+const sendUsersUpdate = () => {
+  sendResponse(echoUserList({ ...UserStorage.getAll() }));
 };
 
-const sendUserListUpdate = () => sendResponse(receiveUserListUpdate(users));
-
-const sendSessionListUpdate = (targetUser = false) =>
-  sendResponse(receiveSessionListUpdate(sessions), targetUser);
-
-const getUser = id => users.byId[id];
-
-const getSession = id => sessions.byId[id];
-
-const userExists = id => users.idList.includes(id);
-
-const userIsParticipant = id => getUser(id).participantIn;
-
-const sessionExists = id => sessions.idList.includes(id);
-
-const getSessionModerator = id => getSession(id).moderator;
-
-const sessionIncludesParticipant = (session, user) =>
-  getSession(session).participants.includes(user);
-
-const setUserProperty = (id, property, value) => {
-  getUser(id)[property] = value;
-};
-
-const setSessionProperty = (id, property, value) => {
-  getSession(id)[property] = value;
-};
-
-const getArrayWithoutValue = (arr, value) => [...arr.filter(x => x !== value)];
-
-const addUser = (id, payload) => {
-  const { username } = payload;
-
-  if (!userExists(id)) {
-    users.idList.push(id);
-    users.byId[id] = {
-      ...userInitialState,
-      id,
-      username
-    };
-  }
-
-  sendUserListUpdate();
-  sendSessionListUpdate(id);
-};
-
-const removeSession = (id, sendUpdate = true) => {
-  delete sessions.byId[id];
-  sessions.idList = getArrayWithoutValue(sessions.idList, id);
-  if (sendUpdate) {
-    sendSessionListUpdate();
-  }
-};
-
-const removeSessionsModeratedBy = id => {
-  sessions.idList.forEach(session => {
-    if (getSession(session).moderator === id) {
-      removeSession(session, false);
-    }
-  });
-};
-
-const removeUser = id => {
-  delete clients[id];
-  delete users.byId[id];
-  users.idList = getArrayWithoutValue(users.idList, id);
-  removeSessionsModeratedBy(id);
-  sendUserListUpdate();
-  sendSessionListUpdate();
-};
-
-const removeUserFromSession = id => {
-  const userParticipantIn = userIsParticipant(id);
-
-  setSessionProperty(
-    userParticipantIn,
-    "participants",
-    getArrayWithoutValue(getSession(userParticipantIn).participants, id)
-  );
-
-  if (!getSession(userParticipantIn).participants.length) {
-    setSessionProperty(userParticipantIn, "status", SESSION_WAITING_FOR_PARTICIPANTS);
-  }
-};
-
-const handleDisconnected = id => {
-  if (userExists(id) && userIsParticipant(id)) {
-    removeUserFromSession(id);
-  }
-
-  sendUserListUpdate();
-  sendSessionListUpdate();
-};
-
-const addSession = payload => {
-  const { id } = payload;
-
-  if (!sessionExists(id)) {
-    sessions.idList.push(id);
-    sessions.byId[id] = {
-      ...sessionInitialState,
-      ...payload,
-      status: SESSION_WAITING_FOR_PARTICIPANTS
-    };
-    sendSessionListUpdate();
-  }
-};
-
-const addUserToSession = payload => {
-  const { session, user } = payload;
-
-  if (getSessionModerator(session) !== user) {
-    if (!sessionIncludesParticipant(session, user)) {
-      getSession(session).participants.push(user);
-      setUserProperty(user, "participantIn", session);
-
-      if (getSession(session).status === SESSION_WAITING_FOR_PARTICIPANTS) {
-        setSessionProperty(session, "status", SESSION_PENDING_LAUNCH);
-      }
-    }
-  } else {
-    setUserProperty(user, "moderatorOf", session);
-  }
-
-  sendUserListUpdate();
-  sendSessionListUpdate();
-};
-
-const userStoriesContainIrregularValue = (session, value) => {
-  return session.userStories.some(story => story.average === value);
-};
-
-const setStatusBeforeFinishing = session => {
-  const { id } = session;
-  let status = SESSION_COMPLETED;
-
-  if (userStoriesContainIrregularValue(session, ESTIMATE_NOT_GIVEN)) {
-    status = SESSION_COMPLETED_WITH_MISSING_ESTIMATES;
-  } else if (userStoriesContainIrregularValue(session, ESTIMATE_IS_UNDOABLE)) {
-    status = SESSION_COMPLETED_WITH_UNDOABLE;
-  } else if (userStoriesContainIrregularValue(session, ESTIMATE_NEEDS_MORE_INFO)) {
-    status = SESSION_COMPLETED_NEED_MORE_INFO;
-  }
-
-  setSessionProperty(id, "status", status);
-};
-
-const checkIfAllEstimatesReceived = session => {
-  const { userStories } = session;
-  const numStories = userStories.length;
-  let numFinished = 0;
-
-  userStories.forEach(userStory => {
-    if (userStory.receivedAllEstimates) {
-      numFinished += 1;
-    }
-  });
-
-  if (numFinished === numStories) {
-    setStatusBeforeFinishing(session);
-  }
-};
-
-const provideEstimate = payload => {
-  const { id, story, value } = payload;
-  const session = getSession(id);
-  const { userStories, participants, scaleType } = session;
-
-  userStories.forEach((userStory, index) => {
-    if (userStory.id === story) {
-      const { estimatesGiven: estimates } = userStories[index];
-      estimates.push(value);
-      if (estimates.length === participants.length) {
-        userStories[index].receivedAllEstimates = true;
-        userStories[index].average = calculateAverage(scaleType, estimates);
-        checkIfAllEstimatesReceived(session);
-      }
-    }
-  });
-
-  sendSessionListUpdate();
-};
-
-const resetSessionStories = (id, logPreviousEstimates = false) => {
-  const stories = getSession(id).userStories.map(story => ({
-    ...story,
-    previousEstimates: logPreviousEstimates
-      ? [...story.previousEstimates, ...story.estimatesGiven]
-      : [],
-    estimatesGiven: [],
-    average: null,
-    receivedAllEstimates: false
-  }));
-
-  setSessionProperty(id, "userStories", stories);
-};
-
-const removeAllParticipantsFromSession = id => {
-  setSessionProperty(id, "participants", []);
-  setSessionProperty(id, "status", SESSION_WAITING_FOR_PARTICIPANTS);
-};
-
-const runSessionAgain = (id, runFresh = false) => {
-  removeAllParticipantsFromSession(id);
-  resetSessionStories(id, !runFresh);
+const sendSessionsUpdate = (targetUser = false) => {
+  sendResponse(echoSessionList({ ...SessionStorage.getAll() }), targetUser);
 };
 
 const updateSessionStatus = payload => {
   const { id, status } = payload;
-  setSessionProperty(id, "status", status);
+  SessionOps.setStatus(id, status);
 
   switch (status) {
     case SESSION_ABORTED:
-      resetSessionStories(id);
+      SessionOps.resetStories(id);
       break;
     case SESSION_RUN_AGAIN:
-      runSessionAgain(id);
+      SessionOps.removeAllParticipants(id);
+      SessionOps.resetStories(id);
       break;
     case SESSION_RUN_AGAIN_FRESH:
-      runSessionAgain(id, true);
+      SessionOps.removeAllParticipants(id);
+      SessionOps.resetStories(id, true);
       break;
     default:
       break;
   }
-
-  sendSessionListUpdate();
 };
 
 const onMessage = (message, id) => {
@@ -282,28 +63,46 @@ const onMessage = (message, id) => {
 
     switch (actionType) {
       case actionTypes.USER_LOGIN:
-        addUser(id, payload);
+        UserOps.add(payload);
+        sendUsersUpdate();
+        sendSessionsUpdate(id);
         break;
       case actionTypes.USER_LOGOUT:
-        removeUser(payload.id);
+        UserOps.remove(payload.id);
+        sendUsersUpdate();
+        sendSessionsUpdate();
         break;
       case actionTypes.GENERATE_NEXT_SESSION_ID:
-        generateNextSessionId(id);
+        SessionStorage.setNextId();
+        sendSessionsUpdate(id);
         break;
       case actionTypes.ADD_SESSION:
-        addSession(payload);
+        SessionOps.add(payload);
+        sendSessionsUpdate();
         break;
       case actionTypes.REMOVE_SESSION:
-        removeSession(payload.id);
+        SessionOps.remove(payload.id);
+        sendSessionsUpdate();
         break;
       case actionTypes.UPDATE_SESSION_STATUS:
         updateSessionStatus(payload);
+        sendSessionsUpdate();
         break;
       case actionTypes.JOIN_SESSION:
-        addUserToSession(payload);
+        {
+          const { session, user } = payload;
+          SessionOps.addParticipant(session, user);
+          UserOps.setActiveSession(user, session);
+          sendUsersUpdate();
+          sendSessionsUpdate();
+        }
         break;
       case actionTypes.PROVIDE_ESTIMATE:
-        provideEstimate(payload);
+        {
+          const { id: sessionId, story, value } = payload;
+          SessionOps.addEstimate(sessionId, story, value);
+          sendSessionsUpdate();
+        }
         break;
       default:
         break;
@@ -311,14 +110,34 @@ const onMessage = (message, id) => {
   }
 };
 
+const flagAsDisconnected = id => {
+  if (!disconnectedUsers.includes(id)) {
+    disconnectedUsers.push(id);
+  }
+};
+
+const removeIfNotReconnected = id => {
+  if (disconnectedUsers.includes(id)) {
+    SessionOps.removeParticipant(UserLookup.getActiveSession(id), id);
+    sendUsersUpdate();
+    sendSessionsUpdate();
+  }
+};
+
 const onClose = id => {
-  handleDisconnected(id);
+  flagAsDisconnected(id);
+  setTimeout(() => removeIfNotReconnected(id), 5000);
 };
 
 server.on("request", request => {
   const client = request.resourceURL.query.id;
   const connection = request.accept(null, request.origin);
   clients[client] = connection;
+
+  if (disconnectedUsers.includes(client)) {
+    disconnectedUsers = ArrayUtil.remove(disconnectedUsers, client);
+  }
+
   connection.on("message", message => onMessage(message, client));
   connection.on("close", () => onClose(client));
 });

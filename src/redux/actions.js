@@ -22,7 +22,7 @@ export const sendUserLogout = id =>
     payload: { id }
   });
 
-export const receiveUserListUpdate = list =>
+export const echoUserList = list =>
   receiveFromServer({
     type: types.USER_LIST_UPDATE,
     payload: { ...list }
@@ -45,7 +45,7 @@ export const sendRemoveSession = id =>
     payload: { id }
   });
 
-export const receiveSessionListUpdate = list =>
+export const echoSessionList = list =>
   receiveFromServer({
     type: types.SESSION_LIST_UPDATE,
     payload: { ...list }

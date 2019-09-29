@@ -7,13 +7,16 @@ import {
   SESSION_INITIALIZING,
   SESSION_PENDING_LAUNCH,
   SESSION_IN_PROGRESS,
-  SESSION_FINISHED,
+  SESSION_FORCE_FINISHED,
   SESSION_ABORTED,
   ESTIMATE_TIME_LIMIT,
   ESTIMATE_NOT_GIVEN,
   SESSION_COMPLETED,
   SESSION_RUN_AGAIN,
-  SESSION_RUN_AGAIN_FRESH
+  SESSION_RUN_AGAIN_FRESH,
+  SESSION_COMPLETED_WITH_UNDOABLE,
+  SESSION_COMPLETED_NEED_MORE_INFO,
+  SESSION_COMPLETED_WITH_MISSING_ESTIMATES
 } from "../../constants";
 import { joinSession, updateSessionStatus, provideEstimate } from "../../redux/actions";
 import { getCurrentUserId } from "../../util/user";
@@ -64,7 +67,7 @@ class Session extends Component {
     // Session is already active and we are updating its status via server.
     if (state.sessionStarted) {
       switch (session.status) {
-        case SESSION_FINISHED:
+        case SESSION_FORCE_FINISHED:
           return { isFinished: true };
         case SESSION_ABORTED:
           return {
@@ -150,7 +153,7 @@ class Session extends Component {
       session: { id }
     } = this.props;
 
-    updateSessionStatus(id, SESSION_FINISHED);
+    updateSessionStatus(id, SESSION_FORCE_FINISHED);
   };
 
   finishForCurrentUser = () => {
@@ -264,15 +267,19 @@ class Session extends Component {
             sendEstimate={this.sendEstimate}
           />
         );
-      case SESSION_FINISHED:
+      case SESSION_FORCE_FINISHED:
         return currentUserIsModerator ? <FinishedForModerator /> : <FinishedForUser />;
       case SESSION_COMPLETED:
+      case SESSION_COMPLETED_WITH_UNDOABLE:
+      case SESSION_COMPLETED_NEED_MORE_INFO:
+      case SESSION_COMPLETED_WITH_MISSING_ESTIMATES:
         return currentUserIsModerator ? (
           <CompletedForModerator
             runSessionAgain={this.runSessionAgain}
             runSessionAgainFresh={this.runSessionAgainFresh}
             addUserStory={this.addUserStory}
             userStories={userStories}
+            status={status}
           />
         ) : (
           <UserGaveAllEstimates />
