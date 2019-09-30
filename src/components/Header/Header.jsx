@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { isLoggedIn } from "../../util/user";
 
 const StyledHeader = styled.header`
+  height: 68px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -16,7 +17,9 @@ const StyledHeader = styled.header`
   }
 
   @media all and (max-width: 767px) {
+    height: 95px;
     flex-direction: column;
+    justify-content: center;
     padding-left: 0;
     padding-right: 0;
 
@@ -29,6 +32,7 @@ const StyledHeader = styled.header`
 const WebsiteTitle = styled(NavLink)`
   font-family: "Maven Pro", sans-serif;
   font-size: 3rem;
+  font-weight: 500;
   color: #000;
   text-decoration: none;
   transition: text-shadow 0.1s ease-in-out;
@@ -40,7 +44,6 @@ const WebsiteTitle = styled(NavLink)`
 
 const MenuLink = styled(NavLink)`
   font-size: 1.75rem;
-  color: #006ea2;
   margin-left: 5px;
 
   &.active {
@@ -72,12 +75,12 @@ const Header = () => {
     isLoggedIn() && (
       <StyledHeader>
         <div>
-          <WebsiteTitle to="/" activeClassName="active" exact>
+          <WebsiteTitle to="/join-sessions" activeClassName="active">
             Planning Poker
           </WebsiteTitle>
         </div>
         <div>
-          <MenuLink to="/join-sessions" activeClassName="active" exact>
+          <MenuLink to="/join-sessions" activeClassName="active">
             Join sessions
           </MenuLink>
           <MenuLinkDivider> | </MenuLinkDivider>

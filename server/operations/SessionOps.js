@@ -22,7 +22,7 @@ const SessionOps = {
 
   addParticipant: (id, participant) => {
     const alreadyIncluded = SessionLookup.includesParticipant(id, participant);
-    const isModerator = SessionLookup.getModerator(id) === participant;
+    const isModerator = SessionLookup.getModerator(id).id === participant;
 
     if (!alreadyIncluded && !isModerator) {
       SessionStorage.setValue(id, "participants", [

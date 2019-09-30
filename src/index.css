@@ -31,12 +31,18 @@ h1 {
 ul,
 ol {
   padding: 0;
+  list-style: none;
 }
 
 a {
   font-weight: 600;
   text-decoration: underline;
-  color: blue;
+  color: #006ea2;
+  transition: color 0.1s ease-in-out;
+}
+
+a:hover {
+  color: #000;
 }
 
 a > h1 {

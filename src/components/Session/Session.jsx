@@ -221,7 +221,7 @@ class Session extends Component {
       session: { moderator }
     } = this.props;
 
-    return moderator === getCurrentUserId();
+    return moderator.id === getCurrentUserId();
   };
 
   renderBasedOnStatus = () => {
@@ -334,7 +334,10 @@ Session.propTypes = {
     name: PropTypes.string.isRequired,
     scaleType: PropTypes.string.isRequired,
     userStories: PropTypes.array.isRequired,
-    moderator: PropTypes.string.isRequired,
+    moderator: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      username: PropTypes.string.isRequired
+    }).isRequired,
     participants: PropTypes.arrayOf(PropTypes.string)
   })
 };

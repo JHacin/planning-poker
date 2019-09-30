@@ -5,7 +5,7 @@ import { withRouter, Redirect } from "react-router-dom";
 import { sendAddSession, sendGenerateNextSessionId } from "../redux/actions";
 import scaleTypes from "../scaleTypes";
 import { SCALE_FIBONACCI } from "../constants";
-import { getCurrentUserId } from "../util/user";
+import { getCurrentUserId, getCurrentUserName } from "../util/user";
 import { userStoryInitialState } from "../redux/reducers/sessions";
 
 const ScaleTypeOptionList = ({ onChange }) => {
@@ -48,7 +48,10 @@ class AddSessionForm extends Component {
     sendAddSession({
       ...restOfState,
       id: nextSessionId,
-      moderator: getCurrentUserId()
+      moderator: {
+        id: getCurrentUserId(),
+        username: getCurrentUserName()
+      }
     });
 
     this.setState({ submitted: true });

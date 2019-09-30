@@ -20,7 +20,7 @@ const UserOps = {
   },
 
   setActiveSession: (id, session) => {
-    if (SessionLookup.getModerator(session) === id) {
+    if (SessionLookup.getModerator(session).id === id) {
       UserStorage.setValue(id, "moderatorOf", session);
     } else {
       UserStorage.setValue(id, "participantIn", session);
@@ -32,11 +32,11 @@ const UserOps = {
   },
 
   removeFromActiveSession: id => {
-    const moderatedSesson = SessionLookup.getByModerator(id);
+    const moderatedSession = SessionLookup.getByModerator(id);
     const activeSession = UserLookup.getActiveSession(id);
 
-    if (moderatedSesson) {
-      SessionOps.remove(moderatedSesson);
+    if (moderatedSession) {
+      SessionOps.remove(moderatedSession);
     }
 
     if (activeSession) {

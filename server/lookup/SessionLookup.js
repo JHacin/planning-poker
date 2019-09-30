@@ -15,9 +15,9 @@ const SessionLookup = {
     return SessionStorage.getById(id).participants.includes(participant);
   },
 
-  getByModerator: moderator => {
+  getByModerator: id => {
     return SessionStorage.getList().find(
-      session => SessionStorage.getById(session).moderator === moderator
+      session => SessionStorage.getById(session).moderator.id === id
     );
   },
 

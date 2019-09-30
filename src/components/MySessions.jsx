@@ -52,7 +52,10 @@ SessionList.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
-      moderator: PropTypes.string.isRequired,
+      moderator: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        username: PropTypes.string.isRequired
+      }).isRequired,
       userStories: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
