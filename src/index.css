@@ -4,12 +4,13 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Roboto", sans-serif;
+  font-family: "Open Sans", sans-serif;
   color: #000;
 }
 
 html {
   font-size: 62.5%;
+  font-weight: 400;
 }
 
 h1,
@@ -18,7 +19,8 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Roboto Mono", sans-serif;
+  font-family: "Maven Pro", sans-serif;
+  font-weight: 500;
 }
 
 h1 {
@@ -32,8 +34,14 @@ ol {
 }
 
 a {
+  font-weight: 600;
   text-decoration: underline;
   color: blue;
+}
+
+a > h1 {
+  text-decoration: none;
+  color: #000;
 }
 
 input:focus {
