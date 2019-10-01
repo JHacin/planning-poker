@@ -1,6 +1,6 @@
 import SessionStorage from "../storage/SessionStorage";
 import { SESSION_COMPLETED } from "../../src/constants";
-import evaluateEstimates from "../../src/util/session";
+import { evaluateEstimates } from "../../src/util/session";
 
 const SessionLookup = {
   exists: id => {
@@ -15,14 +15,12 @@ const SessionLookup = {
     return SessionStorage.getById(id).participants.includes(participant);
   },
 
-  getByModerator: id => {
-    return SessionStorage.getList().find(
-      session => SessionStorage.getById(session).moderator.id === id
-    );
-  },
-
   getModerator: id => {
     return SessionStorage.getById(id).moderator;
+  },
+
+  getByModerator: id => {
+    return SessionStorage.getList().find(session => SessionLookup.getModerator(session).id === id);
   },
 
   getStatus: id => {

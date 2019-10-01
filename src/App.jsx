@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import Header from "./components/Header";
 import JoinSessions from "./components/JoinSessionsPage";
-import MySessions from "./components/MySessions";
+import MySessionsPage from "./components/MySessionsPage";
 import PrivateRoute from "./components/PrivateRoute";
 import LogoutRoute from "./components/LogoutRoute";
 import AddSessionForm from "./components/AddSessionForm";
@@ -15,7 +15,7 @@ const App = () => {
     <Router>
       <Header />
       <PrivateRoute path="/join-sessions" component={JoinSessions} />
-      <PrivateRoute path="/my-sessions" exact component={MySessions} />
+      <PrivateRoute path="/my-sessions" exact component={MySessionsPage} />
       <PrivateRoute path="/my-sessions/add" exact component={AddSessionForm} />
       <PrivateRoute path="/sessions/:id" exact component={Session} />
       <PrivateRoute path="/logout" exact component={LogoutRoute} />

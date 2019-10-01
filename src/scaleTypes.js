@@ -1,5 +1,5 @@
 import { SCALE_FIBONACCI, SCALE_T_SHIRT, SCALE_GAMER } from "./constants";
-import evaluateEstimates from "./util/session";
+import { evaluateEstimates } from "./util/session";
 
 const scaleTypes = [
   {

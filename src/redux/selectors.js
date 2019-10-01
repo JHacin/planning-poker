@@ -9,7 +9,7 @@ export const getSessionById = (state, sessionId) => {
 export const getSessionsCreatedByUser = (state, userId) => {
   return sessionsExist(state)
     ? state.sessions.idList
-        .filter(id => getSessionById(state, id).moderator === userId)
+        .filter(id => getSessionById(state, id).moderator.id === userId)
         .map(sessionId => getSessionById(state, sessionId))
     : [];
 };

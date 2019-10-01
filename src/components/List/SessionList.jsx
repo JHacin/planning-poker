@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { getTitle } from "../../scaleTypes";
+import MediumHeading from "../Heading/MediumHeading";
 
 const SessionDetails = styled.ul`
   display: table-row;
@@ -22,44 +21,27 @@ const SessionDetailsItem = styled.li`
   }
 `;
 
-const Session = ({ session }) => {
-  const { id: sessionId, name, scaleType, moderator } = session;
-
+const Session = ({ columns }) => {
   return (
-    <SessionDetails key={sessionId}>
-      <SessionDetailsItem>
-        <Link to={`/sessions/${sessionId}`}>{name}</Link>
-      </SessionDetailsItem>
-      <SessionDetailsItem>{getTitle(scaleType)}</SessionDetailsItem>
-      <SessionDetailsItem>{`moderated by ${moderator.username}`}</SessionDetailsItem>
+    <SessionDetails>
+      {columns.map(column => (
+        <SessionDetailsItem>{column}</SessionDetailsItem>
+      ))}
     </SessionDetails>
   );
 };
 
 Session.propTypes = {
-  session: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    scaleType: PropTypes.string.isRequired,
-    moderator: PropTypes.shape({
-      username: PropTypes.string.isRequired
-    }).isRequired
-  }).isRequired
+  columns: PropTypes.arrayOf(PropTypes.node).isRequired
 };
 
-const ListHeading = styled.h3`
-  font-size: 2.25rem;
-  margin-bottom: 1.5rem;
-`;
-
-const SessionList = ({ sessions }) => {
-  const { idList, byId } = sessions;
+const SessionList = ({ title, listItems }) => {
   return (
     <div>
-      <ListHeading>Available sessions to join</ListHeading>
+      {title && <MediumHeading>{title}</MediumHeading>}
       <ul>
-        {idList.map(id => (
-          <Session key={id} session={byId[id]} />
+        {listItems.map(item => (
+          <Session key={item} columns={item} />
         ))}
       </ul>
     </div>
@@ -67,10 +49,12 @@ const SessionList = ({ sessions }) => {
 };
 
 SessionList.propTypes = {
-  sessions: PropTypes.shape({
-    idList: PropTypes.arrayOf(PropTypes.number),
-    byId: PropTypes.objectOf(PropTypes.shape({})).isRequired
-  }).isRequired
+  title: PropTypes.string,
+  listItems: PropTypes.arrayOf(PropTypes.array).isRequired
+};
+
+SessionList.defaultProps = {
+  title: false
 };
 
 export default SessionList;
