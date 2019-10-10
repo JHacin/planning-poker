@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 const StyledButton = styled.button`
+  display: ${props => props.display || "inline-block"};
+  margin: ${props => props.margin || 0};
   padding: 0.75rem 3.5rem;
   background: none;
   box-shadow: 2px 2px 1px #000;
@@ -20,8 +22,13 @@ const StyledButton = styled.button`
 `;
 
 const SubmitButton = props => {
-  const { children } = props;
-  return <StyledButton type="submit">{children}</StyledButton>;
+  const { children, ...otherProps } = props;
+
+  return (
+    <StyledButton type="submit" {...otherProps}>
+      {children}
+    </StyledButton>
+  );
 };
 
 SubmitButton.propTypes = {

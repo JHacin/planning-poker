@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import SubmitButton from "../Button/SubmitButton";
+import StyledTextfield from "./Element/StyledTextField";
 
 const Form = styled.form`
   margin: 0 auto;
@@ -10,29 +11,12 @@ const Form = styled.form`
   width: 200px;
 `;
 
-const UsernameInput = styled.input`
-  margin-bottom: 1.5rem;
-  padding: 0.4rem;
-  border: 3px solid #000;
-  font-weight: 600;
-  transition: box-shadow 0.1s ease-in-out;
-
-  &::placeholder {
-    font-weight: 600;
-  }
-
-  &:hover,
-  &:focus {
-    box-shadow: 1px 1px 4px 0px #828282;
-  }
-`;
-
 const UserLoginForm = props => {
   const { handleSubmit, handleInputChange } = props;
 
   return (
     <Form onSubmit={e => handleSubmit(e)}>
-      <UsernameInput
+      <StyledTextfield
         placeholder="Username..."
         required
         onChange={e => handleInputChange(e.target.value)}

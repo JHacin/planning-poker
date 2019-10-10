@@ -7,7 +7,7 @@ import { getCurrentUserId } from "../../../util/user";
 import NoSessionsAvailable from "./NoSessionsAvailable";
 import SessionsAvailable from "./SessionsAvailable";
 import FluidContainer from "../../Container/FluidContainer";
-import MediumHeading from "../../Heading/MediumHeading";
+import MediumHeading from "../../Text/Heading/MediumHeading";
 
 const MySessions = ({ sessions }) => {
   return (

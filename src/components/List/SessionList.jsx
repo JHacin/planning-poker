@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import MediumHeading from "../Heading/MediumHeading";
+import MediumHeading from "../Text/Heading/MediumHeading";
 
 const SessionDetails = styled.ul`
   display: table-row;

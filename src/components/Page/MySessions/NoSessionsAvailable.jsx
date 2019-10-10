@@ -1,12 +1,7 @@
 import React from "react";
-import styled from "styled-components";
 import { Link } from "react-router-dom";
 import SubmitButton from "../../Button/SubmitButton";
-
-const Paragraph = styled.p`
-  font-size: 1.4rem;
-  margin-bottom: 2rem;
-`;
+import Paragraph from "../../Text/Paragraph";
 
 const NoSessionsAvailable = () => {
   return (

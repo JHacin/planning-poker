@@ -3,24 +3,13 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter, Redirect } from "react-router-dom";
 import { sendAddSession, sendGenerateNextSessionId } from "../../../redux/actions";
-import scaleTypes from "../../../scaleTypes";
 import { SCALE_FIBONACCI } from "../../../constants";
 import { getCurrentUserId, getCurrentUserName } from "../../../util/user";
 import { userStoryInitialState } from "../../../redux/reducers/sessions";
+import AddSessionForm from "../../Form/AddSessionForm";
+import FluidContainer from "../../Container/FluidContainer";
 
-const ScaleTypeOptionList = ({ onChange }) => {
-  return (
-    <select onChange={e => onChange(e.target.value)} defaultValue={SCALE_FIBONACCI}>
-      {scaleTypes.map(type => (
-        <option key={type.machineName} value={type.machineName}>
-          {type.title}
-        </option>
-      ))}
-    </select>
-  );
-};
-
-class AddSessionForm extends Component {
+class AddSession extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -57,7 +46,7 @@ class AddSessionForm extends Component {
     this.setState({ submitted: true });
   };
 
-  addUserStory = () => {
+  handleAddUserStory = () => {
     this.setState(prevState => ({
       userStories: [
         ...prevState.userStories,
@@ -89,39 +78,21 @@ class AddSessionForm extends Component {
     }
 
     return (
-      <div>
-        <form onSubmit={e => this.handleSubmit(e)}>
-          <input
-            required
-            placeholder="My session name..."
-            onChange={e => this.handleNameChange(e.target.value)}
-          />
-          <ScaleTypeOptionList onChange={this.handleScaleTypeChange} />
-          <button type="button" onClick={this.addUserStory}>
-            + Add
-            {userStories.length ? " another " : " "}
-            user story
-          </button>
-          {userStories.map(story => (
-            <input
-              required
-              autoFocus
-              key={story.id}
-              onChange={e => this.onUserStoryInputChange(story.id, e.target.value)}
-            />
-          ))}
-          <input type="submit" value="Start" hidden={!userStories.length ? "hidden" : ""} />
-        </form>
-      </div>
+      <FluidContainer>
+        <AddSessionForm
+          handleSubmit={this.handleSubmit}
+          handleNameChange={this.handleNameChange}
+          handleScaleTypeChange={this.handleScaleTypeChange}
+          handleAddUserStory={this.handleAddUserStory}
+          onUserStoryInputChange={this.onUserStoryInputChange}
+          userStories={userStories}
+        />
+      </FluidContainer>
     );
   }
 }
 
-ScaleTypeOptionList.propTypes = {
-  onChange: PropTypes.func.isRequired
-};
-
-AddSessionForm.propTypes = {
+AddSession.propTypes = {
   nextSessionId: PropTypes.number.isRequired,
   sendAddSession: PropTypes.func.isRequired,
   sendGenerateNextSessionId: PropTypes.func.isRequired
@@ -135,5 +106,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     { sendAddSession, sendGenerateNextSessionId }
-  )(AddSessionForm)
+  )(AddSession)
 );
