@@ -3,13 +3,13 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Redirect, withRouter } from "react-router-dom";
 import generateUniqueId from "uuid/v1";
-import { sendUserLogin } from "../../redux/actions";
+import { sendUserLogin } from "../../../redux/actions";
 import {
   getCurrentUserId,
   isLoggedIn,
   addCurrentUserSession
-} from "../../util/user";
-import LoginPage from "./LoginPage";
+} from "../../../util/user";
+import Login from "./Login";
 
 class LoginForm extends Component {
   constructor(props) {
@@ -36,7 +36,7 @@ class LoginForm extends Component {
 
   render() {
     return !isLoggedIn() ? (
-      <LoginPage handleSubmit={this.handleSubmit} handleInputChange={this.handleInputChange} />
+      <Login handleSubmit={this.handleSubmit} handleInputChange={this.handleInputChange} />
     ) : (
       <Redirect to="/my-sessions" />
     );

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Route, Redirect, withRouter } from "react-router-dom";
-import { isLoggedIn } from "../util/user";
+import { isLoggedIn } from "../../util/user";
 
 const PrivateRoute = ({ component: Component, ...otherProps }) => {
   return (

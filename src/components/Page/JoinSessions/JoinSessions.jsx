@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import SessionsAvailable from "./SessionsAvailable";
 import NoSessionsAvailable from "./NoSessionsAvailable";
 
-const JoinSessionsPage = ({ sessions }) => {
+const JoinSessions = ({ sessions }) => {
   const { idList } = sessions;
 
   return !idList || !idList.length ? (
@@ -19,13 +19,13 @@ const mapStateToProps = state => ({
   sessions: state.sessions
 });
 
-JoinSessionsPage.propTypes = {
+JoinSessions.propTypes = {
   sessions: PropTypes.shape({
     idList: PropTypes.arrayOf(PropTypes.number).isRequired
   }).isRequired
 };
 
-JoinSessionsPage.defaulProps = {
+JoinSessions.defaulProps = {
   sessions: {
     idList: []
   }
@@ -35,5 +35,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     null
-  )(JoinSessionsPage)
+  )(JoinSessions)
 );

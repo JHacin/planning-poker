@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { sendUserLogout } from "../redux/actions";
-import { getCurrentUserId } from "../util/user";
+import { sendUserLogout } from "../../../redux/actions";
+import { getCurrentUserId } from "../../../util/user";
 
 class LogoutRoute extends Component {
   componentDidMount() {

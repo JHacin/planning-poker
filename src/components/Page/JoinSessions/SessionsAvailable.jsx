@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import SessionList from "../List/SessionList";
-import FluidContainer from "../Container/FluidContainer";
-import { getTitle } from "../../scaleTypes";
-import LinkToSession from "../Link/LinkToSession";
+import SessionList from "../../List/SessionList";
+import FluidContainer from "../../Container/FluidContainer";
+import { getTitle } from "../../../scaleTypes";
+import LinkToSession from "../../Link/LinkToSession";
 
 const SessionsAvailable = ({ sessions }) => {
   const { idList, byId } = sessions;

@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter, Redirect } from "react-router-dom";
-import { sendAddSession, sendGenerateNextSessionId } from "../redux/actions";
-import scaleTypes from "../scaleTypes";
-import { SCALE_FIBONACCI } from "../constants";
-import { getCurrentUserId, getCurrentUserName } from "../util/user";
-import { userStoryInitialState } from "../redux/reducers/sessions";
+import { sendAddSession, sendGenerateNextSessionId } from "../../../redux/actions";
+import scaleTypes from "../../../scaleTypes";
+import { SCALE_FIBONACCI } from "../../../constants";
+import { getCurrentUserId, getCurrentUserName } from "../../../util/user";
+import { userStoryInitialState } from "../../../redux/reducers/sessions";
 
 const ScaleTypeOptionList = ({ onChange }) => {
   return (

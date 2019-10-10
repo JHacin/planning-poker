@@ -2,14 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { getSessionsCreatedByUser } from "../../redux/selectors";
-import { getCurrentUserId } from "../../util/user";
+import { getSessionsCreatedByUser } from "../../../redux/selectors";
+import { getCurrentUserId } from "../../../util/user";
 import NoSessionsAvailable from "./NoSessionsAvailable";
 import SessionsAvailable from "./SessionsAvailable";
-import FluidContainer from "../Container/FluidContainer";
-import MediumHeading from "../Heading/MediumHeading";
+import FluidContainer from "../../Container/FluidContainer";
+import MediumHeading from "../../Heading/MediumHeading";
 
-const MySessionsPage = ({ sessions }) => {
+const MySessions = ({ sessions }) => {
   return (
     <FluidContainer>
       <MediumHeading>My Sessions</MediumHeading>
@@ -18,7 +18,7 @@ const MySessionsPage = ({ sessions }) => {
   );
 };
 
-MySessionsPage.propTypes = {
+MySessions.propTypes = {
   sessions: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
@@ -30,5 +30,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     null
-  )(MySessionsPage)
+  )(MySessions)
 );

@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import SessionList from "../List/SessionList";
-import { getTitle } from "../../scaleTypes";
-import { getStatusLabel } from "../../util/session";
-import LinkToSession from "../Link/LinkToSession";
+import SessionList from "../../List/SessionList";
+import { getTitle } from "../../../scaleTypes";
+import { getStatusLabel } from "../../../util/session";
+import LinkToSession from "../../Link/LinkToSession";
 
 const SessionsAvailable = ({ sessions }) => {
   const listItems = sessions.map(session => {

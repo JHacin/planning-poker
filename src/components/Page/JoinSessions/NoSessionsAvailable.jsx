@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import SubmitButton from "../Button/SubmitButton";
+import SubmitButton from "../../Button/SubmitButton";
 
 const CenteredWrapper = styled.div`
   display: flex;
