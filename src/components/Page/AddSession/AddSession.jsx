@@ -99,7 +99,7 @@ class AddSession extends Component {
         }}
       >
         <FluidContainer>
-          <AddSessionForm userStories={userStories} />
+          <AddSessionForm />
         </FluidContainer>
       </FormContext.Provider>
     );

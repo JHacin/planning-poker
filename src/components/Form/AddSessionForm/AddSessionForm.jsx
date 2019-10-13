@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import Submit from "./Element/Submit";
 import { FormContext } from "../../Page/AddSession";
+import FormSubmit from "./Element/FormSubmit";
 import SessionNameField from "./Element/SessionNameField";
 import ScaleTypeSelect from "./Element/ScaleTypeSelect";
 import AddStoryButton from "./Element/AddStoryButton";
@@ -25,7 +25,7 @@ const AddSessionForm = () => {
           <AddStoryButton />
           <UserStoriesList />
 
-          <Submit />
+          <FormSubmit />
         </form>
       )}
     </FormContext.Consumer>

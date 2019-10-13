@@ -3,38 +3,21 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import {
-  SESSION_WAITING_FOR_PARTICIPANTS,
-  SESSION_INITIALIZING,
-  SESSION_PENDING_LAUNCH,
   SESSION_IN_PROGRESS,
   SESSION_FORCE_FINISHED,
   SESSION_ABORTED,
   ESTIMATE_TIME_LIMIT,
   ESTIMATE_NOT_GIVEN,
-  SESSION_COMPLETED,
   SESSION_RUN_AGAIN,
-  SESSION_RUN_AGAIN_FRESH,
-  SESSION_COMPLETED_WITH_UNDOABLE,
-  SESSION_COMPLETED_NEED_MORE_INFO,
-  SESSION_COMPLETED_WITH_MISSING_ESTIMATES
+  SESSION_RUN_AGAIN_FRESH
 } from "../../constants";
+import SessionViewRenderer from "./Views/SessionViewRenderer";
 import { joinSession, updateSessionStatus, provideEstimate } from "../../redux/actions";
 import { getCurrentUserId } from "../../util/user";
 import { getUserNameById } from "../../redux/selectors";
 import { getOptionsForType } from "../../scaleTypes";
-import InProgressForUser from "./Views/InProgressForUser";
-import PendingForModerator from "./Views/PendingForModerator";
-import PendingForUser from "./Views/PendingForUser";
-import AbortedForUser from "./Views/AbortedForUser";
-import AbortedForModerator from "./Views/AbortedForModerator";
-import InProgressForModerator from "./Views/InProgressForModerator";
-import FinishedForModerator from "./Views/FinishedForModerator";
-import FinishedForUser from "./Views/FinishedForUser";
-import SessionError from "./Views/SessionError";
-import SessionInitializing from "./Views/SessionInitializing";
-import SessionWaitingForParticipants from "./Views/SessionWaitingForParticipants";
-import UserGaveAllEstimates from "./Views/UserGaveAllEstimates";
-import CompletedForModerator from "./Views/CompletedForModerator";
+import Initializing from "./Views/Initializing";
+import SessionContext from "./Context";
 
 class Session extends Component {
   constructor(props) {
@@ -224,86 +207,42 @@ class Session extends Component {
     return moderator.id === getCurrentUserId();
   };
 
-  renderBasedOnStatus = () => {
-    const {
-      session: { status, participants, userStories }
-    } = this.props;
-    const { currentStory, currentTimeLeft, estimatingOptions, isFinished } = this.state;
-    const currentUserIsModerator = this.currentUserIsModerator();
-
-    if (isFinished) {
-      return <UserGaveAllEstimates />;
-    }
-
-    switch (status) {
-      case SESSION_INITIALIZING:
-        return <SessionInitializing />;
-      case SESSION_WAITING_FOR_PARTICIPANTS:
-        return <SessionWaitingForParticipants />;
-      case SESSION_PENDING_LAUNCH:
-        return currentUserIsModerator ? (
-          <PendingForModerator participants={participants} startSession={this.startSession} />
-        ) : (
-          <PendingForUser />
-        );
-      case SESSION_ABORTED:
-        return currentUserIsModerator ? (
-          <AbortedForModerator participants={participants} startSession={this.startSession} />
-        ) : (
-          <AbortedForUser />
-        );
-      case SESSION_IN_PROGRESS:
-        return currentUserIsModerator ? (
-          <InProgressForModerator
-            finishSession={this.finishSession}
-            abortSession={this.abortSession}
-            userStories={userStories}
-          />
-        ) : (
-          <InProgressForUser
-            currentStory={currentStory}
-            currentTimeLeft={currentTimeLeft}
-            estimatingOptions={estimatingOptions}
-            sendEstimate={this.sendEstimate}
-          />
-        );
-      case SESSION_FORCE_FINISHED:
-        return currentUserIsModerator ? <FinishedForModerator /> : <FinishedForUser />;
-      case SESSION_COMPLETED:
-      case SESSION_COMPLETED_WITH_UNDOABLE:
-      case SESSION_COMPLETED_NEED_MORE_INFO:
-      case SESSION_COMPLETED_WITH_MISSING_ESTIMATES:
-        return currentUserIsModerator ? (
-          <CompletedForModerator
-            runSessionAgain={this.runSessionAgain}
-            runSessionAgainFresh={this.runSessionAgainFresh}
-            addUserStory={this.addUserStory}
-            userStories={userStories}
-            status={status}
-          />
-        ) : (
-          <UserGaveAllEstimates />
-        );
-      default:
-        return <SessionError />;
-    }
-  };
-
   render() {
     const { session } = this.props;
 
     if (!session) {
-      return <SessionInitializing />;
+      return <Initializing />;
     }
 
-    const { name, status } = session;
+    const { name, status, participants, userStories } = session;
+    const { currentStory, currentTimeLeft, estimatingOptions, isFinished } = this.state;
 
     return (
-      <div>
-        <h1>{name}</h1>
-        <h4>{status}</h4>
-        {this.renderBasedOnStatus()}
-      </div>
+      <SessionContext.Provider
+        value={{
+          status,
+          participants,
+          userStories,
+          currentStory,
+          currentTimeLeft,
+          estimatingOptions,
+          isFinished,
+          currentUserIsModerator: this.currentUserIsModerator(),
+          startSession: this.startSession,
+          finishSession: this.finishSession,
+          abortSession: this.abortSession,
+          sendEstimate: this.sendEstimate,
+          runSessionAgain: this.runSessionAgain,
+          runSessionAgainFresh: this.runSessionAgainFresh,
+          addUserStory: this.addUserStory
+        }}
+      >
+        <div>
+          <h1>{name}</h1>
+          <h4>{status}</h4>
+          <SessionViewRenderer />
+        </div>
+      </SessionContext.Provider>
     );
   }
 }

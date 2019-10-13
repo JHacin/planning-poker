@@ -1,7 +1,7 @@
 import React from "react";
 
-const SessionError = () => {
+const Error = () => {
   return <div>There has been an error.</div>;
 };
 
-export default SessionError;
+export default Error;

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import SubmitButton from "../../Button/SubmitButton";
+import ConfirmButton from "../../Button/ConfirmButton";
 
 const CenteredWrapper = styled.div`
   display: flex;
@@ -21,7 +21,7 @@ const NoSessionsAvailable = () => {
     <CenteredWrapper>
       <NoSessionsHeading>Huh, no sessions available. Create one?</NoSessionsHeading>
       <Link to="/my-sessions/add">
-        <SubmitButton>Create session</SubmitButton>
+        <ConfirmButton>Create session</ConfirmButton>
       </Link>
     </CenteredWrapper>
   );

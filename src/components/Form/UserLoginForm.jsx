@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import SubmitButton from "../Button/SubmitButton";
+import ConfirmButton from "../Button/ConfirmButton";
 import StyledTextfield from "./StyledElement/StyledTextField";
 
 const Form = styled.form`
@@ -21,7 +21,7 @@ const UserLoginForm = props => {
         required
         onChange={e => handleInputChange(e.target.value)}
       />
-      <SubmitButton type="submit">Login</SubmitButton>
+      <ConfirmButton type="submit">Login</ConfirmButton>
     </Form>
   );
 };

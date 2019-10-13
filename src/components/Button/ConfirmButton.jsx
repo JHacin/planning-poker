@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
-const StyledButton = styled.button`
+const StyledConfirmButton = styled.button`
   display: ${props => props.display || "inline-block"};
   margin: ${props => props.margin || 0};
   padding: 0.75rem 3.5rem;
@@ -21,18 +21,18 @@ const StyledButton = styled.button`
   }
 `;
 
-const SubmitButton = props => {
+const ConfirmButton = props => {
   const { children, ...otherProps } = props;
 
   return (
-    <StyledButton type="submit" {...otherProps}>
+    <StyledConfirmButton type="submit" {...otherProps}>
       {children}
-    </StyledButton>
+    </StyledConfirmButton>
   );
 };
 
-SubmitButton.propTypes = {
+ConfirmButton.propTypes = {
   children: PropTypes.string.isRequired
 };
 
-export default SubmitButton;
+export default ConfirmButton;
