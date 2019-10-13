@@ -1,5 +1,5 @@
 import { sessionListInitialState } from "../../src/redux/reducers/sessions";
-import ArrayUtil from "../util/array";
+import ArrayUtil from "../../src/util/array";
 
 const sessions = { ...sessionListInitialState };
 
@@ -8,7 +8,7 @@ const SessionStorage = {
   getList: () => sessions.idList,
   getEntities: () => sessions.byId,
   getById: id => sessions.byId[id],
-  
+
   setNextId: () => {
     sessions.nextSessionId += 1;
   },

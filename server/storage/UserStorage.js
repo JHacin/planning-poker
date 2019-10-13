@@ -1,5 +1,5 @@
 import { userListInitialState } from "../../src/redux/reducers/users";
-import ArrayUtil from "../util/array";
+import ArrayUtil from "../../src/util/array";
 
 const users = { ...userListInitialState };
 

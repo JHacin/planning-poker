@@ -5,7 +5,7 @@ import { echoUserList, echoSessionList } from "../src/redux/actions";
 import { SESSION_ABORTED, SESSION_RUN_AGAIN, SESSION_RUN_AGAIN_FRESH } from "../src/constants";
 import UserOps from "./operations/UserOps";
 import SessionOps from "./operations/SessionOps";
-import ArrayUtil from "./util/array";
+import ArrayUtil from "../src/util/array";
 import SessionStorage from "./storage/SessionStorage";
 import UserStorage from "./storage/UserStorage";
 

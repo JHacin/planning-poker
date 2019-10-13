@@ -1,5 +1,5 @@
 import SessionStorage from "../storage/SessionStorage";
-import ArrayUtil from "../util/array";
+import ArrayUtil from "../../src/util/array";
 import { sessionInitialState } from "../../src/redux/reducers/sessions";
 import { SESSION_WAITING_FOR_PARTICIPANTS, SESSION_PENDING_LAUNCH } from "../../src/constants";
 import SessionLookup from "../lookup/SessionLookup";

@@ -5,9 +5,12 @@ import { withRouter, Redirect } from "react-router-dom";
 import { sendAddSession, sendGenerateNextSessionId } from "../../../redux/actions";
 import { SCALE_FIBONACCI } from "../../../constants";
 import { getCurrentUserId, getCurrentUserName } from "../../../util/user";
+import ArrayUtil from "../../../util/array";
 import { userStoryInitialState } from "../../../redux/reducers/sessions";
 import AddSessionForm from "../../Form/AddSessionForm";
 import FluidContainer from "../../Container/FluidContainer";
+
+export const FormContext = React.createContext({});
 
 class AddSession extends Component {
   constructor(props) {
@@ -58,6 +61,12 @@ class AddSession extends Component {
     }));
   };
 
+  handleRemoveUserStory = id => {
+    this.setState(prevState => ({
+      userStories: [...ArrayUtil.removeObjectsByPropValue(prevState.userStories, "id", id)]
+    }));
+  };
+
   onUserStoryInputChange = (storyId, text) => {
     const { userStories } = this.state;
 
@@ -78,16 +87,21 @@ class AddSession extends Component {
     }
 
     return (
-      <FluidContainer>
-        <AddSessionForm
-          handleSubmit={this.handleSubmit}
-          handleNameChange={this.handleNameChange}
-          handleScaleTypeChange={this.handleScaleTypeChange}
-          handleAddUserStory={this.handleAddUserStory}
-          onUserStoryInputChange={this.onUserStoryInputChange}
-          userStories={userStories}
-        />
-      </FluidContainer>
+      <FormContext.Provider
+        value={{
+          handleSubmit: this.handleSubmit,
+          handleNameChange: this.handleNameChange,
+          handleScaleTypeChange: this.handleScaleTypeChange,
+          handleAddUserStory: this.handleAddUserStory,
+          handleRemoveUserStory: this.handleRemoveUserStory,
+          onUserStoryInputChange: this.onUserStoryInputChange,
+          userStories
+        }}
+      >
+        <FluidContainer>
+          <AddSessionForm userStories={userStories} />
+        </FluidContainer>
+      </FormContext.Provider>
     );
   }
 }
