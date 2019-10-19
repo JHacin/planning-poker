@@ -116,6 +116,15 @@ const onMessage = (message, id) => {
           sendSessionsUpdate();
         }
         break;
+      case actionTypes.LEAVE_SESSION:
+          {
+            const { session, user } = payload;
+            SessionOps.removeParticipant(session, user);
+            UserOps.unsetActiveSession(user);
+            sendUsersUpdate();
+            sendSessionsUpdate();
+          }
+          break;
       case actionTypes.PROVIDE_ESTIMATE:
         {
           const { id: sessionId, story, value } = payload;

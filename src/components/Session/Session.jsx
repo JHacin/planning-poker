@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import { withRouter, Redirect } from "react-router-dom";
 import {
   SESSION_IN_PROGRESS,
   SESSION_FORCE_FINISHED,
@@ -12,10 +12,16 @@ import {
   SESSION_RUN_AGAIN_FRESH
 } from "../../constants";
 import SessionViewRenderer from "./Views/SessionViewRenderer";
-import { joinSession, updateSessionStatus, provideEstimate } from "../../redux/actions";
+import {
+  joinSession,
+  leaveSession,
+  updateSessionStatus,
+  provideEstimate
+} from "../../redux/actions";
 import { getCurrentUserId } from "../../util/user";
 import { getUserNameById } from "../../redux/selectors";
 import { getOptionsForType } from "../../scaleTypes";
+import FluidContainer from "../Container/FluidContainer";
 import Initializing from "./Views/Initializing";
 import SessionContext from "./Context";
 
@@ -28,7 +34,8 @@ class Session extends Component {
       currentStory: null,
       currentTimeLeft: ESTIMATE_TIME_LIMIT,
       remainingStories: [],
-      estimatingOptions: []
+      estimatingOptions: [],
+      leavingSession: false
     };
   }
 
@@ -130,6 +137,19 @@ class Session extends Component {
     updateSessionStatus(id, SESSION_IN_PROGRESS);
   };
 
+  leaveCurrentSession = () => {
+    const {
+      leaveSession,
+      match: {
+        params: { id }
+      }
+    } = this.props;
+
+    leaveSession(id, getCurrentUserId());
+
+    this.setState({ leavingSession: true });
+  };
+
   finishSession = () => {
     const {
       updateSessionStatus,
@@ -214,14 +234,26 @@ class Session extends Component {
       return <Initializing />;
     }
 
-    const { name, status, participants, userStories } = session;
-    const { currentStory, currentTimeLeft, estimatingOptions, isFinished } = this.state;
+    const { name, status, participants, moderator, userStories } = session;
+    const {
+      currentStory,
+      currentTimeLeft,
+      estimatingOptions,
+      isFinished,
+      leavingSession
+    } = this.state;
+
+    if (leavingSession) {
+      return <Redirect to="/join-sessions" />;
+    }
 
     return (
       <SessionContext.Provider
         value={{
+          name,
           status,
           participants,
+          moderator,
           userStories,
           currentStory,
           currentTimeLeft,
@@ -234,14 +266,13 @@ class Session extends Component {
           sendEstimate: this.sendEstimate,
           runSessionAgain: this.runSessionAgain,
           runSessionAgainFresh: this.runSessionAgainFresh,
-          addUserStory: this.addUserStory
+          addUserStory: this.addUserStory,
+          leaveCurrentSession: this.leaveCurrentSession
         }}
       >
-        <div>
-          <h1>{name}</h1>
-          <h4>{status}</h4>
+        <FluidContainer>
           <SessionViewRenderer />
-        </div>
+        </FluidContainer>
       </SessionContext.Provider>
     );
   }
@@ -260,6 +291,7 @@ const mapStateToProps = (state, ownProps) => {
 
 Session.propTypes = {
   joinSession: PropTypes.func.isRequired,
+  leaveSession: PropTypes.func.isRequired,
   updateSessionStatus: PropTypes.func.isRequired,
   provideEstimate: PropTypes.func.isRequired,
   match: PropTypes.shape({
@@ -288,6 +320,6 @@ Session.defaultProps = {
 export default withRouter(
   connect(
     mapStateToProps,
-    { joinSession, updateSessionStatus, provideEstimate }
+    { joinSession, leaveSession, updateSessionStatus, provideEstimate }
   )(Session)
 );

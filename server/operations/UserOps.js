@@ -27,6 +27,10 @@ const UserOps = {
     }
   },
 
+  unsetActiveSession: id => {
+    UserStorage.setValue(id, "participantIn", userInitialState.participantIn);
+  },
+
   setModeratedSession: (id, session) => {
     UserStorage.setValue(id, "moderatorOf", session);
   },

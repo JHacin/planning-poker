@@ -57,6 +57,12 @@ export const joinSession = (session, user) =>
     payload: { session, user }
   });
 
+export const leaveSession = (session, user) =>
+  sendToServer({
+    type: types.LEAVE_SESSION,
+    payload: { session, user }
+  });
+
 export const updateSessionStatus = (id, status) =>
   sendToServer({
     type: types.UPDATE_SESSION_STATUS,

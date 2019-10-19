@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
-const AddActionButton = styled.button`
+const ActionButton = styled.button`
+  text-decoration: ${props => props.textDecoration || "inherit"};
   background: none;
   border: none;
   color: #006ea2;
@@ -15,4 +16,4 @@ const AddActionButton = styled.button`
   }
 `;
 
-export default AddActionButton;
+export default ActionButton;

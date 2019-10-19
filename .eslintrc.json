@@ -46,6 +46,7 @@
           "sendAddSession",
           "sendGenerateNextSessionId",
           "joinSession",
+          "leaveSession",
           "updateSessionStatus",
           "provideEstimate"
         ]

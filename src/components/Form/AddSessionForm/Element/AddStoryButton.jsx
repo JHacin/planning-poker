@@ -1,14 +1,14 @@
 import React from "react";
 import { FormContext } from "../../../Page/AddSession";
-import AddActionButton from "../../../Button/AddActionButton";
+import ActionButton from "../../../Button/ActionButton";
 
 const AddStoryButton = () => (
   <FormContext.Consumer>
     {({ handleAddUserStory, userStories }) => {
       return (
-        <AddActionButton type="button" onClick={handleAddUserStory}>
+        <ActionButton type="button" onClick={handleAddUserStory}>
           {`+ Add${userStories.length ? " another " : " "}user story`}
-        </AddActionButton>
+        </ActionButton>
       );
     }}
   </FormContext.Consumer>
