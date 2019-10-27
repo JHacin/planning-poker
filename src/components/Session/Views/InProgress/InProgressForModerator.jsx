@@ -6,7 +6,7 @@ import Paragraph from "../../../Text/Paragraph";
 import SmallHeading from "../../../Text/Heading/SmallHeading";
 import ModeratorViewTopFrame from "../../Components/ModeratorViewTopFrame";
 import ModeratorViewActionButton from "../../Components/ModeratorViewActionButton";
-import ModeratorSessionList from "../../Components/ModeratorSessionList";
+import ModeratorUserStoryList from "../../Components/ModeratorUserStoryList";
 
 const InProgressForModerator = () => (
   <SessionContext.Consumer>
@@ -26,7 +26,7 @@ const InProgressForModerator = () => (
           <span className="action-divider">or</span>
           <ModeratorViewActionButton text="Abort" onClick={abortSession} />
         </ModeratorViewTopFrame>
-        <ModeratorSessionList />
+        <ModeratorUserStoryList />
       </div>
     )}
   </SessionContext.Consumer>
