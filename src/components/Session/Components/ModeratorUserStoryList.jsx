@@ -5,6 +5,14 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SessionContext from "../Context";
 
+const StyledListWrapper = styled.div`
+  &.no-margin-top {
+    > ul {
+      margin-top: 0;
+    }
+  }
+`;
+
 const StyledList = styled.ul`
   margin-top: 5rem;
 `;
@@ -63,16 +71,24 @@ UserStory.propTypes = {
   }).isRequired
 };
 
-const ModeratorUserStoryList = () => (
+const ModeratorUserStoryList = ({ customClassName }) => (
   <SessionContext.Consumer>
     {({ userStories }) => (
-      <div>
+      <StyledListWrapper className={customClassName}>
         <StyledList>
           {userStories.map(story => <UserStory key={story.id} story={story} />)}
         </StyledList>
-      </div>
+      </StyledListWrapper>
     )}
   </SessionContext.Consumer>
 );
+
+ModeratorUserStoryList.propTypes = {
+  customClassName: PropTypes.string
+}
+
+ModeratorUserStoryList.defaultProps = {
+  customClassName: undefined
+}
 
 export default ModeratorUserStoryList;

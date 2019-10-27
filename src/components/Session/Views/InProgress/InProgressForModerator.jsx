@@ -7,6 +7,7 @@ import SmallHeading from "../../../Text/Heading/SmallHeading";
 import ModeratorViewTopFrame from "../../Components/ModeratorViewTopFrame";
 import ModeratorViewActionButton from "../../Components/ModeratorViewActionButton";
 import ModeratorUserStoryList from "../../Components/ModeratorUserStoryList";
+import { getTitle } from "../../../../scaleTypes";
 
 const InProgressForModerator = () => (
   <SessionContext.Consumer>
@@ -14,7 +15,7 @@ const InProgressForModerator = () => (
       <div>
         <SpaceBetween>
           <MediumHeading>{name}</MediumHeading>
-          <MediumHeading>{scaleType}</MediumHeading>
+          <MediumHeading>{getTitle(scaleType)}</MediumHeading>
         </SpaceBetween>
         <ModeratorViewTopFrame>
           <SmallHeading>Participants are still estimating...</SmallHeading>

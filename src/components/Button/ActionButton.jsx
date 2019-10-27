@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const ActionButton = styled.button`
   text-decoration: ${props => props.textDecoration || "inherit"};
+  margin-top: ${props => props.marginTop || 0};
   margin-bottom: ${props => props.marginBottom || "1.5rem"};
   background: none;
   border: none;
