@@ -1,16 +1,11 @@
 import React from "react";
-import styled from "styled-components";
 import { FormContext } from "../../Page/AddSession";
 import FormSubmit from "./Element/FormSubmit";
 import SessionNameField from "./Element/SessionNameField";
 import ScaleTypeSelect from "./Element/ScaleTypeSelect";
 import AddStoryButton from "./Element/AddStoryButton";
 import UserStoriesList from "./Element/UserStoriesList";
-
-const SpaceBetween = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
+import SpaceBetween from "../../Container/SpaceBetween";
 
 const AddSessionForm = () => {
   return (

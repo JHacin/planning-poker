@@ -234,7 +234,7 @@ class Session extends Component {
       return <Initializing />;
     }
 
-    const { name, status, participants, moderator, userStories } = session;
+    const { name, status, participants, moderator, userStories, scaleType } = session;
     const {
       currentStory,
       currentTimeLeft,
@@ -257,6 +257,7 @@ class Session extends Component {
           userStories,
           currentStory,
           currentTimeLeft,
+          scaleType,
           estimatingOptions,
           isFinished,
           currentUserIsModerator: this.currentUserIsModerator(),
@@ -306,7 +307,7 @@ Session.propTypes = {
     scaleType: PropTypes.string.isRequired,
     userStories: PropTypes.array.isRequired,
     moderator: PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       username: PropTypes.string.isRequired
     }).isRequired,
     participants: PropTypes.arrayOf(PropTypes.string)

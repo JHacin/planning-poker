@@ -1,52 +1,32 @@
 import React from "react";
 import SessionContext from "../../Context";
+import SpaceBetween from "../../../Container/SpaceBetween";
+import MediumHeading from "../../../Text/Heading/MediumHeading";
+import Paragraph from "../../../Text/Paragraph";
+import SmallHeading from "../../../Text/Heading/SmallHeading";
+import ModeratorViewTopFrame from "../../Components/ModeratorViewTopFrame";
+import ModeratorViewActionButton from "../../Components/ModeratorViewActionButton";
+import ModeratorSessionList from "../../Components/ModeratorSessionList";
 
 const InProgressForModerator = () => (
   <SessionContext.Consumer>
-    {({ finishSession, abortSession, userStories }) => (
+    {({ name, scaleType, finishSession, abortSession }) => (
       <div>
-        <hr />
-        <h3>Participants are still estimating...</h3>
-        <p>
-          You can finish thre session with the current results or abort it. Aborting will cause all
-          of the estimations to be discarded.
-        </p>
-        <button type="submit" onClick={finishSession}>
-          Finish
-        </button>
-        <span>or</span>
-        <button type="submit" onClick={abortSession}>
-          Abort
-        </button>
-        <hr />
-        <div>
-          <ul>
-            {userStories.map(story => (
-              <li key={story.id}>
-                {story.text}
-                {" | "}
-                <strong>Estimates:</strong>
-                {" | "}
-                {story.estimatesGiven.map(estimate => (
-                  <span key={estimate}>
-                    {estimate}
-                    {" - "}
-                  </span>
-                ))}
-                {" | "}
-                <span>
-                  {story.receivedAllEstimates
-                    ? "Received all estimates"
-                    : "Waiting for remaining estimates"}
-                </span>
-                {" | "}
-                <span>
-                  {story.average ? story.average : "Will calculate when all estimates are given"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <SpaceBetween>
+          <MediumHeading>{name}</MediumHeading>
+          <MediumHeading>{scaleType}</MediumHeading>
+        </SpaceBetween>
+        <ModeratorViewTopFrame>
+          <SmallHeading>Participants are still estimating...</SmallHeading>
+          <Paragraph>
+            You can finish the session with the current results or abort it. Aborting will cause all
+            of the estimations to be discarded.
+          </Paragraph>
+          <ModeratorViewActionButton text="Finish" onClick={finishSession} />
+          <span className="action-divider">or</span>
+          <ModeratorViewActionButton text="Abort" onClick={abortSession} />
+        </ModeratorViewTopFrame>
+        <ModeratorSessionList />
       </div>
     )}
   </SessionContext.Consumer>
