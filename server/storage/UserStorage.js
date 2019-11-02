@@ -6,7 +6,6 @@ const users = { ...userListInitialState };
 const UserStorage = {
   getAll: () => users,
   getList: () => users.idList,
-  getEntities: () => users.byId,
   getById: id => users.byId[id],
 
   add: (id, data) => {
@@ -25,10 +24,6 @@ const UserStorage = {
 
   setValue: (id, prop, value) => {
     UserStorage.getById(id)[prop] = value;
-  },
-
-  getValue: (id, prop) => {
-    return UserStorage.getById(id)[prop];
   }
 };
 

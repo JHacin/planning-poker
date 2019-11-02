@@ -6,7 +6,6 @@ const sessions = { ...sessionListInitialState };
 const SessionStorage = {
   getAll: () => sessions,
   getList: () => sessions.idList,
-  getEntities: () => sessions.byId,
   getById: id => sessions.byId[id],
 
   setNextId: () => {

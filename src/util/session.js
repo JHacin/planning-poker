@@ -58,6 +58,6 @@ export const getStatusLabel = status => {
     case SESSION_COMPLETED_WITH_MISSING_ESTIMATES:
       return "Finished";
     default:
-      return "<Could not retrieve status>";
+      return "Could not retrieve status";
   }
 };

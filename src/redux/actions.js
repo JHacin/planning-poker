@@ -39,12 +39,6 @@ export const sendAddSession = data =>
     payload: { ...data }
   });
 
-export const sendRemoveSession = id =>
-  sendToServer({
-    type: types.REMOVE_SESSION,
-    payload: { id }
-  });
-
 export const echoSessionList = list =>
   receiveFromServer({
     type: types.SESSION_LIST_UPDATE,
