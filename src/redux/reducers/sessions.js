@@ -27,13 +27,11 @@ export const userStoryInitialState = {
 };
 
 const sessions = (state = sessionListInitialState, action) => {
-  if (action.type === RECEIVE_FROM_SERVER) {
-    switch (action.message.type) {
-      case SESSION_LIST_UPDATE:
-        return { ...action.message.payload };
-      default:
-        return state;
-    }
+  if (
+    action.type === RECEIVE_FROM_SERVER &&
+    action.message.type === SESSION_LIST_UPDATE
+  ) {
+    return { ...action.message.payload };
   }
 
   return state;

@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
 import Login from "./components/Page/Login";
 import Header from "./components/Header";
 import JoinSessions from "./components/Page/JoinSessions";
@@ -23,7 +28,10 @@ const App = () => {
         <PrivateRoute path="/my-sessions/add" exact component={AddSession} />
         <PrivateRoute path="/sessions/:id" exact component={Session} />
         <PrivateRoute path="/logout" exact component={Logout} />
-        <Route path="/" render={() => <Redirect to={catchAllRedirectLocation} />} />
+        <Route
+          path="/"
+          render={() => <Redirect to={catchAllRedirectLocation} />}
+        />
       </Switch>
     </Router>
   );

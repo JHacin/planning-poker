@@ -13,13 +13,11 @@ export const userInitialState = {
 };
 
 const users = (state = userListInitialState, action) => {
-  if (action.type === RECEIVE_FROM_SERVER) {
-    switch (action.message.type) {
-      case USER_LIST_UPDATE:
-        return { ...action.message.payload };
-      default:
-        return state;
-    }
+  if (
+    action.type === RECEIVE_FROM_SERVER &&
+    action.message.type === USER_LIST_UPDATE
+  ) {
+    return { ...action.message.payload };
   }
 
   return state;

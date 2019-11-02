@@ -8,7 +8,11 @@ import LinkToSession from "../../Link/LinkToSession";
 const SessionsAvailable = ({ sessions }) => {
   const listItems = sessions.map(session => {
     const { scaleType, status } = session;
-    return [<LinkToSession session={session} />, getTitle(scaleType), getStatusLabel(status)];
+    return [
+      <LinkToSession session={session} />,
+      getTitle(scaleType),
+      getStatusLabel(status)
+    ];
   });
 
   return <SessionList listItems={listItems} />;

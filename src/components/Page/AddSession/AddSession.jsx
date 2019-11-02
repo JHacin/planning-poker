@@ -2,7 +2,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter, Redirect } from "react-router-dom";
-import { sendAddSession, sendGenerateNextSessionId } from "../../../redux/actions";
+import {
+  sendAddSession,
+  sendGenerateNextSessionId
+} from "../../../redux/actions";
 import { SCALE_FIBONACCI } from "../../../constants";
 import { getCurrentUserId, getCurrentUserName } from "../../../util/user";
 import ArrayUtil from "../../../util/array";
@@ -63,7 +66,9 @@ class AddSession extends Component {
 
   handleRemoveUserStory = id => {
     this.setState(prevState => ({
-      userStories: [...ArrayUtil.removeObjectsByPropValue(prevState.userStories, "id", id)]
+      userStories: [
+        ...ArrayUtil.removeObjectsByPropValue(prevState.userStories, "id", id)
+      ]
     }));
   };
 

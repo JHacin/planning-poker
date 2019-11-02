@@ -8,7 +8,11 @@ import store from "./redux/store";
 
 WebFont.load({
   google: {
-    families: ["Open Sans:300,400,600,700:latin", "Maven Pro:400,500,700:latin", "sans-serif"]
+    families: [
+      "Open Sans:300,400,600,700:latin",
+      "Maven Pro:400,500,700:latin",
+      "sans-serif"
+    ]
   }
 });
 

@@ -1,9 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import {
+  faQuestionCircle,
+  faExclamationCircle,
+  faSpinner
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SessionContext from "../Context";
+import {
+  ESTIMATE_IS_UNDOABLE,
+  ESTIMATE_NEEDS_MORE_INFO,
+  ESTIMATE_NOT_GIVEN
+} from "../../../constants";
 
 const StyledListWrapper = styled.div`
   &.no-margin-top {
@@ -39,13 +48,30 @@ const StyledUserStoryAverage = styled.div`
   font-size: 3.5rem;
 `;
 
+const FormattedAverage = ({ average }) => {
+  switch (average) {
+    case ESTIMATE_NOT_GIVEN:
+      return average; // Todo: handle this differently.
+    case ESTIMATE_IS_UNDOABLE:
+      return <FontAwesomeIcon icon={faExclamationCircle} />;
+    case ESTIMATE_NEEDS_MORE_INFO:
+      return <FontAwesomeIcon icon={faQuestionCircle} />;
+    default:
+      return average;
+  }
+};
+
 const UserStoryAverage = ({ story }) => {
   const { receivedAllEstimates, average } = story;
   return (
     <StyledUserStoryAverage>
-      {receivedAllEstimates ? average : <FontAwesomeIcon icon={faSpinner} spin />}
+      {receivedAllEstimates ? (
+        <FormattedAverage average={average} />
+      ) : (
+        <FontAwesomeIcon icon={faSpinner} spin />
+      )}
     </StyledUserStoryAverage>
-  )
+  );
 };
 
 UserStoryAverage.propTypes = {
@@ -76,7 +102,9 @@ const ModeratorUserStoryList = ({ customClassName }) => (
     {({ userStories }) => (
       <StyledListWrapper className={customClassName}>
         <StyledList>
-          {userStories.map(story => <UserStory key={story.id} story={story} />)}
+          {userStories.map(story => (
+            <UserStory key={story.id} story={story} />
+          ))}
         </StyledList>
       </StyledListWrapper>
     )}
@@ -85,10 +113,10 @@ const ModeratorUserStoryList = ({ customClassName }) => (
 
 ModeratorUserStoryList.propTypes = {
   customClassName: PropTypes.string
-}
+};
 
 ModeratorUserStoryList.defaultProps = {
   customClassName: undefined
-}
+};
 
 export default ModeratorUserStoryList;

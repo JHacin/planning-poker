@@ -1,12 +1,12 @@
 import React from "react";
 import SessionContext from "../../Context";
-import AbortedForModerator from "./AbortedForModerator";
 import AbortedForUser from "./AbortedForUser";
+import WaitingForParticipants from "../WaitingForParticipants";
 
 const Aborted = () => (
   <SessionContext.Consumer>
     {({ currentUserIsModerator }) =>
-      currentUserIsModerator ? <AbortedForModerator /> : <AbortedForUser />
+      currentUserIsModerator ? <WaitingForParticipants /> : <AbortedForUser />
     }
   </SessionContext.Consumer>
 );

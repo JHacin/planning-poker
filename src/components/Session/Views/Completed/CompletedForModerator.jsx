@@ -4,11 +4,13 @@ import {
   SESSION_COMPLETED,
   SESSION_COMPLETED_WITH_UNDOABLE,
   SESSION_COMPLETED_NEED_MORE_INFO,
-  SESSION_COMPLETED_WITH_MISSING_ESTIMATES
+  SESSION_COMPLETED_WITH_MISSING_ESTIMATES,
+  SESSION_RUN_AGAIN,
+  SESSION_RUN_AGAIN_FRESH
 } from "../../../../constants";
 import SessionContext from "../../Context";
 import MediumHeading from "../../../Text/Heading/MediumHeading";
-import {getTitle} from "../../../../scaleTypes";
+import { getTitle } from "../../../../scaleTypes";
 import SpaceBetween from "../../../Container/SpaceBetween";
 import ModeratorViewTopFrame from "../../Components/ModeratorViewTopFrame";
 import SmallHeading from "../../../Text/Heading/SmallHeading";
@@ -69,20 +71,31 @@ const getModeratorTopFrameText = () => (
 
 const ModeratorTopFrameActions = () => (
   <SessionContext.Consumer>
-    {({ status, runSessionAgain, runSessionAgainFresh }) => {
+    {({ status, updateStatus }) => {
       switch (status) {
         case SESSION_COMPLETED:
           return (
             <div>
-              <ModeratorViewActionButton text="Run again" onClick={runSessionAgain} />
+              <ModeratorViewActionButton
+                text="Run again"
+                onClick={() => updateStatus(SESSION_RUN_AGAIN)}
+              />
               <span className="action-divider">or</span>
-              <ModeratorViewActionButton text="Run again fresh" onClick={runSessionAgainFresh} />
+              <ModeratorViewActionButton
+                text="Run again fresh"
+                onClick={() => updateStatus(SESSION_RUN_AGAIN_FRESH)}
+              />
             </div>
           );
         case SESSION_COMPLETED_WITH_UNDOABLE:
         case SESSION_COMPLETED_NEED_MORE_INFO:
         case SESSION_COMPLETED_WITH_MISSING_ESTIMATES:
-          return <ModeratorViewActionButton text="Run again" onClick={runSessionAgain} />;
+          return (
+            <ModeratorViewActionButton
+              text="Run again"
+              onClick={() => updateStatus(SESSION_RUN_AGAIN)}
+            />
+          );
         default:
           return false;
       }

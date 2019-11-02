@@ -15,5 +15,7 @@ export const getSessionsCreatedByUser = (state, userId) => {
 };
 
 export const getUserNameById = (state, userId) => {
-  return state.users.idList.includes(userId) ? state.users.byId[userId].username : "";
+  return state.users.idList.includes(userId)
+    ? state.users.byId[userId].username
+    : "";
 };

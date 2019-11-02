@@ -1,5 +1,8 @@
 import React from "react";
-import { ESTIMATE_NEEDS_MORE_INFO, ESTIMATE_IS_UNDOABLE } from "../../../../constants";
+import {
+  ESTIMATE_NEEDS_MORE_INFO,
+  ESTIMATE_IS_UNDOABLE
+} from "../../../../constants";
 import SessionContext from "../../Context";
 
 const InProgressForUser = () => (
@@ -16,7 +19,10 @@ const InProgressForUser = () => (
         <ul>
           {estimatingOptions.map(option => (
             <li key={option.value}>
-              <button type="submit" onClick={() => sendEstimate(currentStory.id, option.value)}>
+              <button
+                type="submit"
+                onClick={() => sendEstimate(currentStory.id, option.value)}
+              >
                 {option.label}
               </button>
             </li>
@@ -24,7 +30,9 @@ const InProgressForUser = () => (
           <li>
             <button
               type="submit"
-              onClick={() => sendEstimate(currentStory.id, ESTIMATE_NEEDS_MORE_INFO)}
+              onClick={() =>
+                sendEstimate(currentStory.id, ESTIMATE_NEEDS_MORE_INFO)
+              }
             >
               Needs info
             </button>
@@ -32,7 +40,9 @@ const InProgressForUser = () => (
           <li>
             <button
               type="submit"
-              onClick={() => sendEstimate(currentStory.id, ESTIMATE_IS_UNDOABLE)}
+              onClick={() =>
+                sendEstimate(currentStory.id, ESTIMATE_IS_UNDOABLE)
+              }
             >
               Undoable
             </button>

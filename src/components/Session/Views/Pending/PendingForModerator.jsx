@@ -8,6 +8,7 @@ import LargeHeading from "../../../Text/Heading/LargeHeading";
 import Paragraph from "../../../Text/Paragraph";
 import ConfirmButton from "../../../Button/ConfirmButton";
 import CenterText from "../../../Container/CenterText";
+import { SESSION_IN_PROGRESS } from "../../../../constants";
 
 const StyledParticipantList = styled.ul`
   display: flex;
@@ -48,20 +49,27 @@ ParticipantAvatar.propTypes = {
 
 const PendingForModerator = () => (
   <SessionContext.Consumer>
-    {({ name, participants, startSession }) => (
+    {({ name, participants, updateStatus }) => (
       <CenterText>
         <LargeHeading>{name}</LargeHeading>
         <StyledParticipantList>
           {participants.map(participant => (
-            <ParticipantAvatar key={participant} participantName={participant} />
+            <ParticipantAvatar
+              key={participant}
+              participantName={participant}
+            />
           ))}
         </StyledParticipantList>
-        <ConfirmButton onClick={startSession} display="block" margin="2rem auto">
+        <ConfirmButton
+          onClick={() => updateStatus(SESSION_IN_PROGRESS)}
+          display="block"
+          margin="2rem auto"
+        >
           Go
         </ConfirmButton>
         <Paragraph>
-          You can wait for more participants or start. The session will become unavailable to join
-          during the process.
+          You can wait for more participants or start. The session will become
+          unavailable to join during the process.
         </Paragraph>
       </CenterText>
     )}

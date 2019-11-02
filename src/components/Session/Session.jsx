@@ -3,13 +3,10 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter, Redirect } from "react-router-dom";
 import {
-  SESSION_IN_PROGRESS,
   SESSION_FORCE_FINISHED,
   SESSION_ABORTED,
   ESTIMATE_TIME_LIMIT,
-  ESTIMATE_NOT_GIVEN,
-  SESSION_RUN_AGAIN,
-  SESSION_RUN_AGAIN_FRESH
+  ESTIMATE_NOT_GIVEN
 } from "../../constants";
 import SessionViewRenderer from "./Views/SessionViewRenderer";
 import {
@@ -35,7 +32,8 @@ class Session extends Component {
       currentTimeLeft: ESTIMATE_TIME_LIMIT,
       remainingStories: [],
       estimatingOptions: [],
-      leavingSession: false
+      leavingSession: false,
+      allowReRendering: true
     };
   }
 
@@ -54,21 +52,17 @@ class Session extends Component {
       };
     }
 
-    // Session is already active and we are updating its status via server.
-    if (state.sessionStarted) {
-      switch (session.status) {
-        case SESSION_FORCE_FINISHED:
-          return { isFinished: true };
-        case SESSION_ABORTED:
-          return {
-            sessionStarted: false,
-            currentStory: null,
-            remainingStories: session.userStories,
-            currentTimeLeft: ESTIMATE_TIME_LIMIT
-          };
-        default:
-          return state;
-      }
+    // If the session has just been aborted/finished, stop refreshing the view for ex-participants.
+    if (
+      state.sessionStarted &&
+      session.moderator.id !== getCurrentUserId() &&
+      (session.status === SESSION_ABORTED ||
+        session.status === SESSION_FORCE_FINISHED)
+    ) {
+      return {
+        ...state,
+        allowReRendering: false
+      };
     }
 
     return state;
@@ -85,8 +79,18 @@ class Session extends Component {
     joinSession(id, getCurrentUserId());
   }
 
+  shouldComponentUpdate() {
+    const { allowReRendering } = this.state;
+    return allowReRendering;
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    const { currentStory, currentTimeLeft, isFinished, sessionStarted } = this.state;
+    const {
+      currentStory,
+      currentTimeLeft,
+      isFinished,
+      sessionStarted
+    } = this.state;
 
     if (!this.currentUserIsModerator()) {
       // Session has just begun.
@@ -128,15 +132,6 @@ class Session extends Component {
     }
   };
 
-  startSession = () => {
-    const {
-      updateSessionStatus,
-      session: { id }
-    } = this.props;
-
-    updateSessionStatus(id, SESSION_IN_PROGRESS);
-  };
-
   leaveCurrentSession = () => {
     const {
       leaveSession,
@@ -150,44 +145,17 @@ class Session extends Component {
     this.setState({ leavingSession: true });
   };
 
-  finishSession = () => {
+  updateStatus = status => {
     const {
       updateSessionStatus,
       session: { id }
     } = this.props;
 
-    updateSessionStatus(id, SESSION_FORCE_FINISHED);
+    updateSessionStatus(id, status);
   };
 
   finishForCurrentUser = () => {
     this.setState({ isFinished: true });
-  };
-
-  abortSession = () => {
-    const {
-      updateSessionStatus,
-      session: { id }
-    } = this.props;
-
-    updateSessionStatus(id, SESSION_ABORTED);
-  };
-
-  runSessionAgain = () => {
-    const {
-      updateSessionStatus,
-      session: { id }
-    } = this.props;
-
-    updateSessionStatus(id, SESSION_RUN_AGAIN);
-  };
-
-  runSessionAgainFresh = () => {
-    const {
-      updateSessionStatus,
-      session: { id }
-    } = this.props;
-
-    updateSessionStatus(id, SESSION_RUN_AGAIN_FRESH);
   };
 
   addUserStory = () => {
@@ -198,7 +166,8 @@ class Session extends Component {
     // updateSessionStatus(id, SESSION_RUN_AGAIN_FRESH);
   };
 
-  noStoriesLeftForCurrentUser = state => state.sessionStarted && !state.remainingStories.length;
+  noStoriesLeftForCurrentUser = state =>
+    state.sessionStarted && !state.remainingStories.length;
 
   goToNextStory = () => {
     this.setState(prevState => ({
@@ -234,7 +203,14 @@ class Session extends Component {
       return <Initializing />;
     }
 
-    const { name, status, participants, moderator, userStories, scaleType } = session;
+    const {
+      name,
+      status,
+      participants,
+      moderator,
+      userStories,
+      scaleType
+    } = session;
     const {
       currentStory,
       currentTimeLeft,
@@ -261,12 +237,8 @@ class Session extends Component {
           estimatingOptions,
           isFinished,
           currentUserIsModerator: this.currentUserIsModerator(),
-          startSession: this.startSession,
-          finishSession: this.finishSession,
-          abortSession: this.abortSession,
+          updateStatus: this.updateStatus,
           sendEstimate: this.sendEstimate,
-          runSessionAgain: this.runSessionAgain,
-          runSessionAgainFresh: this.runSessionAgainFresh,
           addUserStory: this.addUserStory,
           leaveCurrentSession: this.leaveCurrentSession
         }}
@@ -283,7 +255,9 @@ const mapStateToProps = (state, ownProps) => {
   const session = state.sessions.byId[ownProps.match.params.id];
 
   if (session) {
-    const participants = session.participants.map(id => getUserNameById(state, id));
+    const participants = session.participants.map(id =>
+      getUserNameById(state, id)
+    );
     session.participants = participants;
   }
 

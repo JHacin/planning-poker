@@ -1,7 +1,10 @@
 import SessionStorage from "../storage/SessionStorage";
 import ArrayUtil from "../../src/util/array";
 import { sessionInitialState } from "../../src/redux/reducers/sessions";
-import { SESSION_WAITING_FOR_PARTICIPANTS, SESSION_PENDING_LAUNCH } from "../../src/constants";
+import {
+  SESSION_WAITING_FOR_PARTICIPANTS,
+  SESSION_PENDING_LAUNCH
+} from "../../src/constants";
 import SessionLookup from "../lookup/SessionLookup";
 import { calculateAverage } from "../../src/scaleTypes";
 import UserLookup from "../lookup/UserLookup";
@@ -17,7 +20,7 @@ const SessionOps = {
   },
 
   remove: id => {
-    SessionStorage.add(id);
+    SessionStorage.remove(id);
   },
 
   addParticipant: (id, participant) => {
@@ -30,9 +33,7 @@ const SessionOps = {
         participant
       ]);
 
-      if (SessionLookup.getStatus(id) === SESSION_WAITING_FOR_PARTICIPANTS) {
-        SessionOps.setStatus(id, SESSION_PENDING_LAUNCH);
-      }
+      SessionOps.setStatus(id, SESSION_PENDING_LAUNCH);
     }
   },
 
@@ -41,7 +42,10 @@ const SessionOps = {
       SessionStorage.setValue(
         id,
         "participants",
-        ArrayUtil.remove(SessionStorage.getValue(id, "participants"), participant)
+        ArrayUtil.remove(
+          SessionStorage.getValue(id, "participants"),
+          participant
+        )
       );
 
       if (!SessionLookup.hasParticipants(id)) {
@@ -73,7 +77,10 @@ const SessionOps = {
     const userStory = SessionLookup.getStoryById(sessionId, storyId);
 
     userStory.receivedAllEstimates = true;
-    userStory.average = calculateAverage(session.scaleType, userStory.estimatesGiven);
+    userStory.average = calculateAverage(
+      session.scaleType,
+      userStory.estimatesGiven
+    );
 
     if (SessionLookup.sessionIsCompleted(sessionId)) {
       SessionOps.completeSession(sessionId);

@@ -13,7 +13,11 @@ const MySessions = ({ sessions }) => {
   return (
     <FluidContainer>
       <MediumHeading>My Sessions</MediumHeading>
-      {sessions.length ? <SessionsAvailable sessions={sessions} /> : <NoSessionsAvailable />}
+      {sessions.length ? (
+        <SessionsAvailable sessions={sessions} />
+      ) : (
+        <NoSessionsAvailable />
+      )}
     </FluidContainer>
   );
 };

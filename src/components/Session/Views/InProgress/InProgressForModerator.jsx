@@ -8,10 +8,11 @@ import ModeratorViewTopFrame from "../../Components/ModeratorViewTopFrame";
 import ModeratorViewActionButton from "../../Components/ModeratorViewActionButton";
 import ModeratorUserStoryList from "../../Components/ModeratorUserStoryList";
 import { getTitle } from "../../../../scaleTypes";
+import { SESSION_ABORTED, SESSION_FORCE_FINISHED } from "../../../../constants";
 
 const InProgressForModerator = () => (
   <SessionContext.Consumer>
-    {({ name, scaleType, finishSession, abortSession }) => (
+    {({ name, scaleType, updateStatus }) => (
       <div>
         <SpaceBetween>
           <MediumHeading>{name}</MediumHeading>
@@ -20,12 +21,18 @@ const InProgressForModerator = () => (
         <ModeratorViewTopFrame>
           <SmallHeading>Participants are still estimating...</SmallHeading>
           <Paragraph>
-            You can finish the session with the current results or abort it. Aborting will cause all
-            of the estimations to be discarded.
+            You can finish the session with the current results or abort it.
+            Aborting will cause all of the estimations to be discarded.
           </Paragraph>
-          <ModeratorViewActionButton text="Finish" onClick={finishSession} />
+          <ModeratorViewActionButton
+            text="Finish"
+            onClick={() => updateStatus(SESSION_FORCE_FINISHED)}
+          />
           <span className="action-divider">or</span>
-          <ModeratorViewActionButton text="Abort" onClick={abortSession} />
+          <ModeratorViewActionButton
+            text="Abort"
+            onClick={() => updateStatus(SESSION_ABORTED)}
+          />
         </ModeratorViewTopFrame>
         <ModeratorUserStoryList />
       </div>

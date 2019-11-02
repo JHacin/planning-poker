@@ -21,7 +21,10 @@ const Login = props => {
     <PageWrapper>
       <div>
         <Heading>Planning Poker</Heading>
-        <UserLoginForm handleSubmit={handleSubmit} handleInputChange={handleInputChange} />
+        <UserLoginForm
+          handleSubmit={handleSubmit}
+          handleInputChange={handleInputChange}
+        />
       </div>
     </PageWrapper>
   );

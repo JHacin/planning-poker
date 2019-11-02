@@ -19,7 +19,9 @@ const NoSessionsHeading = styled.h3`
 const NoSessionsAvailable = () => {
   return (
     <CenteredWrapper>
-      <NoSessionsHeading>Huh, no sessions available. Create one?</NoSessionsHeading>
+      <NoSessionsHeading>
+        Huh, no sessions available. Create one?
+      </NoSessionsHeading>
       <Link to="/my-sessions/add">
         <ConfirmButton>Create session</ConfirmButton>
       </Link>

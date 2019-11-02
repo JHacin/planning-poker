@@ -20,15 +20,15 @@ const SessionLookup = {
   },
 
   getByModerator: id => {
-    return SessionStorage.getList().find(session => SessionLookup.getModerator(session).id === id);
-  },
-
-  getStatus: id => {
-    return SessionStorage.getById(id).status;
+    return SessionStorage.getList().find(
+      session => SessionLookup.getModerator(session).id === id
+    );
   },
 
   getStoryById: (sessionId, storyId) => {
-    return SessionStorage.getById(sessionId).userStories.find(story => story.id === storyId);
+    return SessionStorage.getById(sessionId).userStories.find(
+      story => story.id === storyId
+    );
   },
 
   storyIsCompleted: (sessionId, storyId) => {
@@ -38,7 +38,9 @@ const SessionLookup = {
   },
 
   sessionIsCompleted: sessionId => {
-    return SessionStorage.getById(sessionId).userStories.every(story => story.receivedAllEstimates);
+    return SessionStorage.getById(sessionId).userStories.every(
+      story => story.receivedAllEstimates
+    );
   },
 
   getStatusOnCompletion: id => {

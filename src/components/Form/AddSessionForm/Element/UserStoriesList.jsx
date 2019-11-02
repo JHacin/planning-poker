@@ -51,7 +51,10 @@ const UserStory = ({ id }) => (
           padding="0.4rem 6% 0.4rem 0.4rem"
         />
         <UserStoryRemove>
-          <FontAwesomeIcon icon={faTimesCircle} onClick={() => handleRemoveUserStory(id)} />
+          <FontAwesomeIcon
+            icon={faTimesCircle}
+            onClick={() => handleRemoveUserStory(id)}
+          />
         </UserStoryRemove>
       </UserStoryRow>
     )}
@@ -72,7 +75,9 @@ const UserStoriesList = () => (
           ))}
         </div>
       ) : (
-        <Paragraph>You need to add some user stories before you can start this session.</Paragraph>
+        <Paragraph>
+          You need to add some user stories before you can start this session.
+        </Paragraph>
       )
     }
   </FormContext.Consumer>

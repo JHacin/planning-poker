@@ -15,6 +15,6 @@ const ModeratorViewActionButton = ({ text, ...otherProps }) => (
 
 ModeratorViewActionButton.propTypes = {
   text: PropTypes.string.isRequired
-}
+};
 
 export default ModeratorViewActionButton;

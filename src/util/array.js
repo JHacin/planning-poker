@@ -4,7 +4,7 @@ const ArrayUtil = {
   },
 
   removeObjectsByPropValue: (arr, prop, value) => {
-    return arr.filter(obj => obj[prop] !== value)
+    return arr.filter(obj => obj[prop] !== value);
   }
 };
 

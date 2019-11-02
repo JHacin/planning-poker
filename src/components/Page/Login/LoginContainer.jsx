@@ -36,7 +36,10 @@ class LoginForm extends Component {
 
   render() {
     return !isLoggedIn() ? (
-      <Login handleSubmit={this.handleSubmit} handleInputChange={this.handleInputChange} />
+      <Login
+        handleSubmit={this.handleSubmit}
+        handleInputChange={this.handleInputChange}
+      />
     ) : (
       <Redirect to="/my-sessions" />
     );

@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_USER_ID, LOCAL_STORAGE_USER_NAME } from "../constants";
 
-export const getCurrentUserId = () => localStorage.getItem(LOCAL_STORAGE_USER_ID);
+export const getCurrentUserId = () =>
+  localStorage.getItem(LOCAL_STORAGE_USER_ID);
 
 export const isLoggedIn = () => getCurrentUserId() !== null;
 
@@ -10,7 +11,8 @@ export const setCurrentUserId = id => {
   }
 };
 
-export const getCurrentUserName = () => localStorage.getItem(LOCAL_STORAGE_USER_NAME);
+export const getCurrentUserName = () =>
+  localStorage.getItem(LOCAL_STORAGE_USER_NAME);
 
 export const setCurrentUserName = username => {
   if (getCurrentUserName() === null) {
@@ -21,7 +23,7 @@ export const setCurrentUserName = username => {
 export const addCurrentUserSession = (id, username) => {
   setCurrentUserId(id);
   setCurrentUserName(username);
-}
+};
 
 export const removeCurrentUserSession = () => {
   localStorage.removeItem(LOCAL_STORAGE_USER_ID);

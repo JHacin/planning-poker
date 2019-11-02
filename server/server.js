@@ -2,7 +2,12 @@ import { createServer } from "http";
 import { server as WebSocketServer } from "websocket";
 import * as actionTypes from "../src/redux/actionTypes";
 import { echoUserList, echoSessionList } from "../src/redux/actions";
-import { SESSION_ABORTED, SESSION_RUN_AGAIN, SESSION_RUN_AGAIN_FRESH } from "../src/constants";
+import {
+  SESSION_ABORTED,
+  SESSION_FORCE_FINISHED,
+  SESSION_RUN_AGAIN,
+  SESSION_RUN_AGAIN_FRESH
+} from "../src/constants";
 import UserOps from "./operations/UserOps";
 import SessionOps from "./operations/SessionOps";
 import ArrayUtil from "../src/util/array";
@@ -40,14 +45,14 @@ const flagAsDisconnected = id => {
   }
 };
 
-const unflagAsDisconnected = id => {
+const unFlagAsDisconnected = id => {
   disconnectedUsers = ArrayUtil.remove(disconnectedUsers, id);
 };
 
 const removeIfNotReconnected = id => {
   if (disconnectedUsers.includes(id)) {
     UserOps.remove(id);
-    unflagAsDisconnected(id);
+    unFlagAsDisconnected(id);
     sendUsersUpdate();
     sendSessionsUpdate();
   }
@@ -55,16 +60,14 @@ const removeIfNotReconnected = id => {
 
 const updateSessionStatus = payload => {
   const { id, status } = payload;
-  SessionOps.setStatus(id, status);
 
   switch (status) {
     case SESSION_ABORTED:
-      SessionOps.resetStories(id);
-      break;
     case SESSION_RUN_AGAIN:
       SessionOps.removeAllParticipants(id);
       SessionOps.resetStories(id);
       break;
+    case SESSION_FORCE_FINISHED:
     case SESSION_RUN_AGAIN_FRESH:
       SessionOps.removeAllParticipants(id);
       SessionOps.resetStories(id, true);
@@ -72,6 +75,8 @@ const updateSessionStatus = payload => {
     default:
       break;
   }
+
+  SessionOps.setStatus(id, status);
 };
 
 const onMessage = (message, id) => {
@@ -87,7 +92,7 @@ const onMessage = (message, id) => {
         break;
       case actionTypes.USER_LOGOUT:
         UserOps.remove(payload.id);
-        unflagAsDisconnected(payload.id);
+        unFlagAsDisconnected(payload.id);
         sendUsersUpdate();
         sendSessionsUpdate();
         break;
@@ -117,14 +122,14 @@ const onMessage = (message, id) => {
         }
         break;
       case actionTypes.LEAVE_SESSION:
-          {
-            const { session, user } = payload;
-            SessionOps.removeParticipant(session, user);
-            UserOps.unsetActiveSession(user);
-            sendUsersUpdate();
-            sendSessionsUpdate();
-          }
-          break;
+        {
+          const { session, user } = payload;
+          SessionOps.removeParticipant(session, user);
+          UserOps.unsetActiveSession(user);
+          sendUsersUpdate();
+          sendSessionsUpdate();
+        }
+        break;
       case actionTypes.PROVIDE_ESTIMATE:
         {
           const { id: sessionId, story, value } = payload;
@@ -144,12 +149,12 @@ server.on("request", request => {
   clients[client] = connection;
 
   if (disconnectedUsers.includes(client)) {
-    unflagAsDisconnected(client);
+    unFlagAsDisconnected(client);
   }
 
   connection.on("message", message => onMessage(message, client));
   connection.on("close", () => {
     flagAsDisconnected(client);
-    setTimeout(() => removeIfNotReconnected(client), 5000);
+    setTimeout(() => removeIfNotReconnected(client), 3000);
   });
 });

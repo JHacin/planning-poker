@@ -1,7 +1,11 @@
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import { SEND_TO_SERVER, USER_LOGOUT } from "./actionTypes";
 import { sendUserLogin } from "./actions";
-import { getCurrentUserId, getCurrentUserName, removeCurrentUserSession } from "../util/user";
+import {
+  getCurrentUserId,
+  getCurrentUserName,
+  removeCurrentUserSession
+} from "../util/user";
 
 const webSocketMiddleware = store => {
   let socket;

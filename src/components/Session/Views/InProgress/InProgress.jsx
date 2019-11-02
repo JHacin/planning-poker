@@ -6,7 +6,11 @@ import SessionContext from "../../Context";
 const InProgress = () => (
   <SessionContext.Consumer>
     {({ currentUserIsModerator }) =>
-      currentUserIsModerator ? <InProgressForModerator /> : <InProgressForUser />
+      currentUserIsModerator ? (
+        <InProgressForModerator />
+      ) : (
+        <InProgressForUser />
+      )
     }
   </SessionContext.Consumer>
 );
